@@ -71,7 +71,7 @@ videóinak letöltése; DRM-védett videó.
 | Beállítások tárolása | `chrome.storage.sync` (beállítások, szabályok, mentett promptok; szabályonként és promptonként külön kulcs); `chrome.storage.local` (munkamenetek); a kiegészítő IndexedDB-je (kinyert tartalom, feliratok), amelyet csak a kiegészítő oldalai és a háttér írnak, a tartalomszkript üzenettel küldi az adatot | TS9: Google fiókon át szinkron; a sync kvóta 100 KB összesen és 8 KB elemenként; a tartalomszkript IndexedDB-je az oldalé lenne, nem a miénk. |
 | Bővítmény-azonosító | rögzített `key` a manifestben | A companion app csak egy ismert azonosítójú kiegészítőnek válaszol. |
 | Companion app | Python 3.12, `uv`, native messaging host; telepítés `install.ps1` szkripttel (HKCU, admin nélkül) | Karesz válasza (2: companion app); a VDH CoApp mintája. |
-| Claude elérés | companion app → `claude -p --output-format stream-json --verbose --include-partial-messages`, a `session_id` az `init` eseményből, utókérdés `--resume <session_id>`; semleges munkakönyvtárban (`%LOCALAPPDATA%\Siteview\claude`, hogy ne töltsön be projekt-CLAUDE.md-t), eszközök nélkül (a CLI aktuális kapcsolójával, a 10. csomag a `claude --help` alapján rögzíti); tartalék: Messages API saját kulccsal | Karesz döntése (saját modul, Max előfizetés); csak szöveget dolgoz fel, fájlhoz és parancshoz nem nyúlhat. |
+| Claude elérés | companion app → `claude -p --output-format stream-json --verbose --include-partial-messages`, a `session_id` az `init` eseményből, utókérdés `--resume <session_id>`; semleges munkakönyvtárban (`%LOCALAPPDATA%\Siteview\claude`, hogy ne töltsön be projekt-CLAUDE.md-t); a felhasználói `~/.claude/CLAUDE.md` így is betöltődhet, ezt a 10. csomag ellenőrzi, és ha zavar, a CLI megfelelő kapcsolójával kikapcsolja, eszközök nélkül (a CLI aktuális kapcsolójával, a 10. csomag a `claude --help` alapján rögzíti); tartalék: Messages API saját kulccsal | Karesz döntése (saját modul, Max előfizetés); csak szöveget dolgoz fel, fájlhoz és parancshoz nem nyúlhat. |
 | Felirat motor | faster-whisper, `small.en` alap, beállításban választható modell; VAD szűrés | Angolra elég pontos CPU-n is; GPU-t magától használ, ha van. |
 | Hangforrás sorrendje | 1) már van felirat → nem generál; 2) yt-dlp az oldal URL-jével `bestaudio/worst` formátummal: ez a külön hangsávot választja, ha van (SG1), különben a legkisebb minőséget (SG3); 3) csak ha a yt-dlp nem ismeri az oldalt: a `webRequest`-tel kilesett `.m3u8`/`.mpd`/hang URL, a tab sütijeivel átadva | Karesz kérése; a yt-dlp a támogatott oldalakon (YouTube is) megbízhatóbban kezeli az aláírt, lejáró címeket, mint a kilesett URL. |
 | Teljes oldalas kép | alapút: `chrome.debugger` + `Page.captureScreenshot` `captureBeyondViewport`-tal, előtte görgetés a lusta képekhez; tartalék: görgetés és összefűzés belső görgetésű oldalaknál, és ha a `debugger` nem csatolható | Egy lépésben kevesebb hiba; a sárga „hibakeresés” sáv elfogadott (második kör). |
@@ -84,7 +84,7 @@ videóinak letöltése; DRM-védett videó.
 | Hosszú műveletek | lépésjelző (Letöltés → Átírás → Kész), százalék, megszakítás | Kutatás: [Grok lépésjelző](https://refero.design/pages/047ee35d-9a1c-4c90-b380-73455cf879e8), [Perplexity „Working…”](https://refero.design/pages/552acfca-d391-4de5-b403-0a39b5c03446) (kutatas/eredmenyek.md). |
 | Képernyőkép export | előnézet + jobb oldali sáv: PNG, JPEG, PDF, vágólap | Kutatás: [Excalidraw export](https://refero.design/pages/4f3a60e5-0f88-4092-9735-3a10bee4cc7d) (kutatas/eredmenyek.md). |
 | Vizuális irány | a 2. munkacsomag állítja be a `refero-design` skillel; addig semleges tokenek egy fájlban | A dizájnkutatás útja: előbb vizuális irány, utána a felületek. |
-| Hosszú companion munkák | a companion a felirat- és képsor-munkát külön folyamatban futtatja job-azonosítóval, és a munka a port lezárulása után is fut; a kiegészítő újracsatlakozáskor `job.status`-szal kérdez rá. A portot a panel vagy egy offscreen dokumentum tartja nyitva, nem a háttér service worker | A Chrome bezárja a portot és leállítja a hostot, ha a hívó service worker leáll; percekig tartó átírás így elveszne. |
+| Hosszú companion munkák | a companion a felirat- és képsor-munkát külön folyamatban futtatja job-azonosítóval, és a munka a port lezárulása után is fut; a kiegészítő újracsatlakozáskor `job.status`-szal kérdez rá, és az a port szakadása alatt keletkezett szegmenseket is visszaadja, így a felirat nem lesz lyukas. A portot a panel vagy egy offscreen dokumentum tartja nyitva, nem a háttér service worker | A Chrome bezárja a portot és leállítja a hostot, ha a hívó service worker leáll; percekig tartó átírás így elveszne. |
 | Tesztelhetőség | minden felhasználói indítás (helyi menü, billentyűparancs, gyorsgomb) egy közös `runAction(név, adatok)` háttérüzenetet hív; az e2e ezt hívja közvetlenül. A panel e2e-ben `chrome-extension://<id>/sidepanel.html` lapként nyílik. Letöltés e2e-ben `saveAs: false` mellett, a Playwright letöltési mappájában ellenőrizve. A helyi menü és a parancs bekötését Vitest ellenőrzi (a regisztrált menüpont és parancs a jó `runAction`-t hívja) | A Playwright nem tud böngésző-helyi menüre kattintani, `chrome.commands` billentyűt kiváltani és az eszköztár-ikonra kattintani. |
 
 ## Részletes működés modulonként
@@ -100,7 +100,7 @@ videóinak letöltése; DRM-védett videó.
 - Billentyűparancs: `Alt+Shift+P` képernyőkép, `Alt+Shift+S` panel megnyitása (a Chrome `commands` alapján,
   felülírható a `chrome://extensions/shortcuts` oldalon).
 - Jogosultságok: `tabs`, `tabGroups`, `storage`, `unlimitedStorage`, `alarms`, `contextMenus`, `sidePanel`,
-  `downloads`, `scripting`, `offscreen`, `nativeMessaging`, `debugger` (képernyőkép), `webRequest` (felirat tartalék),
+  `downloads`, `scripting`, `offscreen`, `nativeMessaging`, `debugger` (képernyőkép), `webRequest` (felirat tartalék, HLS/DASH képsáv),
   `cookies` (felirat tartalék), host: `<all_urls>`. Most mind kötelező; publikáláskor a modulhoz kötöttek
   (`debugger`, `webRequest`, `cookies`, `nativeMessaging`) `optional_permissions`-be kerülnek, és a modul
   bekapcsolásakor kéri őket.
@@ -166,12 +166,19 @@ videóinak letöltése; DRM-védett videó.
 - VD8 alapváltozat: a videó teljes ablakos vagy teljes képernyős saját keretbe kerül, saját folyamatsávval, beállítható
   billentyűparancsokkal, és itt jelenik meg a generált felirat. Menü: felirat, sebesség, kép a képben.
 - VD8 tekerési előnézet: a folyamatsáv fölött az egér helyén kis kép az adott pillanatról, alatta az időpont. Forrás
-  sorrendben: 1) sima videófájl (`src` URL, nem `blob:`): rejtett második `<video>` ugyanarra a címre, a kurzor
-  idejére tekerve, magát az elemet mutatva kicsiben (nem canvas, így más domain videójánál sem akad el), ritkítva
-  kb. 100 ms-onként; 2) YouTube: a lejátszó saját előnézeti képei (storyboard) a `ytInitialPlayerResponse`-ból;
-  3) HLS/DASH: ha a lista ad előnézeti sávot (I-frame lista vagy thumbnail sáv); 4) companion app: ffmpeg
-  előnézeti képsor (10 mp-enként) a legkisebb minőségből, ugyanabban a letöltésben, mint a felirat, és a felirattal
-  együtt gyorsítótárazva. Ha egyik sincs, csak az időpont látszik.
+  sorrendben:
+  1) sima videófájl (`src` URL, nem `blob:`): második `<video>` (`muted`, `preload="auto"`) ugyanarra a címre, a
+     kurzor idejére tekerve, magát az elemet mutatva kicsiben a tooltipben (nem canvas, így más domain videójánál sem
+     akad el), ritkítva kb. 100 ms-onként; a szervernek Range-kérést kell támogatnia, különben a következő út jön;
+  2) YouTube: a lejátszó saját előnézeti képei (storyboard). A `ytInitialPlayerResponse` a lap fő világában él, ezért
+     egy `world: 'MAIN'` szkript olvassa ki, és videóváltáskor (`yt-navigate-finish`) újraolvassa; a storyboard
+     sablon (`$L`, `$N`, `sigh`) feloldása külön Vitest-eset;
+  3) HLS/DASH: csak ha a lista képsávot ad (HLS `EXT-X-IMAGE-STREAM-INF`, DASH `image/jpeg` adaptation set); a lista
+     URL-je a `webRequest` megfigyelésből jön. Az I-frame listát nem használjuk, mert az videó, nem kép;
+  4) companion app: ffmpeg képsor (10 mp-enként) egy külön `worstvideo` letöltésből (a felirat hangsávja nem ad
+     képet). Csak kifejezett kérésre indul (a VD8 menüjében „Előnézet készítése”, vagy a felirat beállításában
+     „felirattal együtt” kapcsoló), egérmozgásra soha. A kész képsor a felirat mellé kerül a gyorsítótárba.
+  Ha egyik sincs, vagy a companion app nem fut, csak az időpont látszik.
 - VD10: oldalszűrő: mindenhol / feketelista / fehérlista.
 
 ### Claude
@@ -276,7 +283,7 @@ vizuális irányt használják.
 
 | # | Mit | Függ ettől | Párhuzamosítható | Ellenőrzés (parancs vagy lépés) |
 | --- | --- | --- | --- | --- |
-| 1 | **Próba.** WXT váz, rögzített `key`, mag (modulregiszter, beállítások sync, `runAction`, oldalpanel héj semleges tokenekkel, helyi menü keret), oldalpanel alap tablista (TS1 csoportfejlécekkel), Altatás modul `beforeDiscard` horoggal; CI (GitHub Actions: build, Vitest, Playwright Chromiummal). Kockázati próbák: (a) `chrome.debugger.attach` működik-e Playwright alatt; (b) hamis native host bekötése Linux CI-ban (`~/.config/chromium/NativeMessagingHosts/`, rögzített azonosítóval); (c) nyitott native port a panelből, a service worker leállása után is él-e | – | – | Vitest: kivétel-logika, időzítés; e2e: tablista megjelenik; tesztidővel (1 perc) altat; rögzített, hangot játszó, kitöltött űrlapos tab nem altat; ATD10 YouTube-szerű tesztoldalon `t=` bekerül; a három próba eredménye a PR-ban (ha (a) nem megy, a 6. csomag e2e-je a tartalék utat teszteli; ha (b) nem megy, a 10–11. csomag e2e-je transport-absztrakció mögötti hamis hosttal fut); CI zöld |
+| 1 | **Próba.** WXT váz, rögzített `key`, mag (modulregiszter, beállítások sync, `runAction`, oldalpanel héj semleges tokenekkel, helyi menü keret), oldalpanel alap tablista (TS1 csoportfejlécekkel), Altatás modul `beforeDiscard` horoggal; CI (GitHub Actions: build, Vitest, Playwright Chromiummal). Kockázati próbák: (a) `chrome.debugger.attach` működik-e Playwright alatt; (b) hamis native host bekötése Linux CI-ban (`~/.config/chromium/NativeMessagingHosts/`, rögzített azonosítóval); (c) nyitott native port a panelből és egy offscreen dokumentumból (ha ott elérhető a `connectNative`), a service worker leállása után is él-e; a nyertes út lesz a portgazda | – | – | Vitest: kivétel-logika, időzítés; e2e: tablista megjelenik; tesztidővel (1 perc) altat; rögzített, hangot játszó, kitöltött űrlapos tab nem altat; ATD10 YouTube-szerű tesztoldalon `t=` bekerül; a három próba eredménye a PR-ban (ha (a) nem megy, a 6. csomag e2e-je a tartalék utat teszteli; ha (b) nem megy, a 10–11. csomag e2e-je transport-absztrakció mögötti hamis hosttal fut); CI zöld |
 | 2 | Vizuális irány a `refero-design` skillel: tokenek, tipográfia, közös komponensek (lista sor, kapcsoló, lenyíló, HUD, lépésjelző); `kutatas/vizualis-irany.md` | 1 | – | a panel és egy tesztoldal HUD-ja világos és sötét módban képernyőképpel a PR-ban; e2e zöld |
 | 3 | Oldalpanel teljes: TS2, TS3, TS4 (cím/URL keresés, szűrő lenyíló, üres állapot), TS5, TS10, TS11, gyorsgomb sor | 2 | 4-gyel | e2e: szabály szerint csoportosít; munkamenet ment/visszaállít; keresés szűr; kijelölt tabok rendezése a böngészőben is; URL ráhúzása tabot nyit |
 | 4 | Duplikátumok + linkjelölés | 2 | 3-mal, 5-tel | Vitest: normalizálás (táblázatos esetek); e2e: duplikátum → régi tab aktív, új bezárul; aktív védelem; „Megnyitás kivételként”; linkjelölés megjelenik és eltűnik a tab bezárásakor |
@@ -329,7 +336,8 @@ Automatikusan (Playwright, hamis companion hosttal; a helyi menü és a billenty
 (nincs)
 
 ## Változásnapló
-- v1 2026-10-21: első változat (jóváhagyás előtt még: VD8 tekerési előnézet Karesz kérésére; a független review
-  után tesztelhetőség `runAction`-nel, hosszú companion munkák, IndexedDB a kiegészítő oldalán, `claude -p`
-  kapcsolók, kockázati próbák az 1. csomagban, yt-dlp az elsődleges hangforrás, jogosultságlista). a KAPU 1 összefoglalója, a válogató (69 funkció), a második kör és a dizájnkutatás
-  alapján.
+- v1 2026-10-21: első változat a KAPU 1 összefoglalója, a válogató (69 funkció), a második kör és a dizájnkutatás
+  alapján. Jóváhagyás előtt még bekerült: VD8 tekerési előnézet (Karesz kérésére); a két független review kör után
+  tesztelhetőség `runAction`-nel, hosszú companion munkák jobként, IndexedDB a kiegészítő oldalán, `claude -p`
+  kapcsolók, kockázati próbák az 1. csomagban, yt-dlp az elsődleges hangforrás, jogosultságlista, a tekerési
+  előnézet forrásainak pontosítása.
