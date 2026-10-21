@@ -26,7 +26,7 @@ tabkeresés, felirat generálása). Mellé egy companion app fut a Windows gép�
 | Altatás | ATD1, ATD2, ATD4 (szűkítve), ATD5, ATD7, ATD9, ATD10 |
 | Oldalpanel | TS1, TS2, TS3, TS4 (+TC), TS5 (valódi átrendezéssel), TS10, TS11 |
 | Duplikátumok | DT1, DT2, DT3 (jobb klikkes kivétel), DT4 (két kapcsoló), DT6, DT8, új: linkjelölés |
-| Videóvezérlés | VD1 (vegyes mód), VD2–VD7, VD8 (alapváltozat), VD10 |
+| Videóvezérlés | VD1 (vegyes mód), VD2–VD7, VD8 (alapváltozat, tekerési előnézettel), VD10 |
 | Claude | CS2, CS4 (jobb klikk: kijelölés nélkül az oldal, kijelöléssel a kijelölés), CS5 |
 | Képmentés | SI1 (csak JPG és PNG), SI4 |
 | Képernyőkép | GF1–GF6 |
@@ -157,6 +157,13 @@ videóinak letöltése; DRM-védett videó.
   korrigált idő kapcsolható).
 - VD8 alapváltozat: a videó teljes ablakos vagy teljes képernyős saját keretbe kerül, saját folyamatsávval, beállítható
   billentyűparancsokkal, és itt jelenik meg a generált felirat. Menü: felirat, sebesség, kép a képben.
+- VD8 tekerési előnézet: a folyamatsáv fölött az egér helyén kis kép az adott pillanatról, alatta az időpont. Forrás
+  sorrendben: 1) sima videófájl (`src` URL, nem `blob:`): rejtett második `<video>` ugyanarra a címre, a kurzor
+  idejére tekerve, magát az elemet mutatva kicsiben (nem canvas, így más domain videójánál sem akad el), ritkítva
+  kb. 100 ms-onként; 2) YouTube: a lejátszó saját előnézeti képei (storyboard) a `ytInitialPlayerResponse`-ból;
+  3) HLS/DASH: ha a lista ad előnézeti sávot (I-frame lista vagy thumbnail sáv); 4) companion app: ffmpeg
+  előnézeti képsor (10 mp-enként) a legkisebb minőségből, ugyanabban a letöltésben, mint a felirat, és a felirattal
+  együtt gyorsítótárazva. Ha egyik sincs, csak az időpont látszik.
 - VD10: oldalszűrő: mindenhol / feketelista / fehérlista.
 
 ### Claude
@@ -231,7 +238,8 @@ videóinak letöltése; DRM-védett videó.
 - Native messaging (stdio, 4 bájtos hosszelőtag); a hostból a kiegészítőnek menő üzenet legfeljebb 1 MB, ezért a
   feliratot és a Claude választ darabokban küldi.
 - Parancsok: `ping` (verzió, elérhető eszközök: `claude`, `yt-dlp`, ffmpeg, modell), `claude.run` (stream, megszakítható),
-  `subtitle.start` / `subtitle.cancel` (állapot- és szegmensüzenetekkel), `subtitle.get` (gyorsítótárból).
+  `subtitle.start` / `subtitle.cancel` (állapot- és szegmensüzenetekkel), `subtitle.get` (gyorsítótárból),
+  `thumbs.start` / `thumbs.get` (előnézeti képsor JPEG csempékben, darabokban küldve).
 - `install.ps1`: a host manifestjét a `%LOCALAPPDATA%\Siteview\` alá írja, és bejegyzi a
   `HKCU\Software\Google\Chrome\NativeMessagingHosts\com.siteview.companion` és a
   `HKCU\Software\Microsoft\Edge\NativeMessagingHosts\com.siteview.companion` kulcsot; `allowed_origins` csak a
@@ -256,7 +264,7 @@ szerverrel), külső oldalra nem mennek.
 | 8 | Videóvezérlés (VD1–VD7, VD10) és a videókonténer kijelölése | 2 | 7-tel | e2e: tesztvideón görgő bal/jobb félen hangerő/ugrás; HUD megjelenik; overlay mód gombbal takart videón; sebesség 16x-ig; PiP hívás; feketelistán nem működik |
 | 9 | TC3–TC4: tartalom szerinti keresés, mezőszűrő, rendezés mező szerint, találatra ugrás | 7 | 10-zel | e2e: három nyitott tesztoldal közül a tartalom alapján talál; „ár ≤” szűrő; rendezés ár szerint; altatott tabnál ébresztés és görgetés |
 | 10 | Companion app alap + `install.ps1`/`uninstall.ps1` + Claude modul (CS2, CS4, CS5, tartalék API) | 1 | 9-cel | pytest: üzenetkeretezés, `claude.run` hamis `claude` paranccsal; e2e: hamis native hosttal a panel folyamatosan mutatja a választ, utókérdés, leállítás, „companion nem fut” állapot. **Kézi lépés Karesz gépén, jóváhagyással:** `install.ps1`, majd valódi összefoglaló egy oldalról |
-| 11 | VD8 alapváltozat + Felirat (SG1, SG3, SG4, SG5, SG6) | 8, 10 | – | pytest: rövid angol hangmintán `tiny.en` modellel szegmensek; e2e: hamis hosttal darabonként érkező felirat a videón, állapot a HUD-on és a jelvényen, gyorsítótárból második alkalommal azonnal, `.srt` export, meglévő felirat esetén nem generál |
+| 11 | VD8 alapváltozat tekerési előnézettel + Felirat (SG1, SG3, SG4, SG5, SG6) | 8, 10 | – | pytest: rövid angol hangmintán `tiny.en` modellel szegmensek; ffmpeg képsor egy tesztvideóból; e2e: sima `.mp4` tesztvideón a folyamatsáv fölé húzva megjelenik az előnézet a jó időponttal, `blob:` forrású tesztvideón hamis hosttól kapott képsorral; hamis hosttal darabonként érkező felirat a videón, állapot a HUD-on és a jelvényen, gyorsítótárból második alkalommal azonnal, `.srt` export, meglévő felirat esetén nem generál |
 | 12 | Végponttól végpontig ellenőrzés és átadás | 1–11 | – | a lenti forgatókönyv e2e változata zöld; Karesz gépén kézi végigpróba |
 
 ## Végponttól végpontig tartó ellenőrzés
@@ -294,5 +302,5 @@ Automatikusan (Playwright, hamis companion hosttal) és Karesz gépén kézzel, 
 (nincs)
 
 ## Változásnapló
-- v1 2026-10-21: első változat a KAPU 1 összefoglalója, a válogató (69 funkció), a második kör és a dizájnkutatás
+- v1 2026-10-21: első változat (utólag, jóváhagyás előtt: VD8 tekerési előnézet Karesz kérésére) a KAPU 1 összefoglalója, a válogató (69 funkció), a második kör és a dizájnkutatás
   alapján.
