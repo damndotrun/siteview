@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="hu">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Képek</title>
+  </head>
+  <body>
+    <h1>Képek</h1>
+    <!-- Bal fele piros, jobb fele teljesen átlátszó (40×20). -->
+    <img id="png" src="/atlatszo.png" alt="PNG" />
+    <img id="webp" src="/atlatszo.webp" alt="WebP" />
+    <!-- Hotlink-védett: a szerver csak oldalról jövő (Referer-es) kérésre adja ki. -->
+    <img id="vedett" src="/vedett/atlatszo.png" alt="Védett" />
+    <img id="idegen" alt="Védett, más domainről" />
+    <script>
+      // Más eredet (localhost a 127.0.0.1 helyett), CORS nélkül: a canvas „szennyezett” lesz.
+      document.getElementById('idegen').src = `http://localhost:${location.port}/vedett/atlatszo.webp`;
+    </script>
+  </body>
+</html>
