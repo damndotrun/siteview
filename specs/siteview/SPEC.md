@@ -1,5 +1,5 @@
 # Siteview: saját böngésző-kiegészítő
-Verzió: 1 · 2026-10-22 · Állapot: jóváhagyva (#1 merge)
+Verzió: 1.1 · 2026-10-22 · Állapot: jóváhagyva
 
 ## Cél és kész-feltétel
 
@@ -84,7 +84,7 @@ videóinak letöltése; DRM-védett videó.
 | Hosszú műveletek | lépésjelző (Letöltés → Átírás → Kész), százalék, megszakítás | Kutatás: [Grok lépésjelző](https://refero.design/pages/047ee35d-9a1c-4c90-b380-73455cf879e8), [Perplexity „Working…”](https://refero.design/pages/552acfca-d391-4de5-b403-0a39b5c03446) (kutatas/eredmenyek.md). |
 | Képernyőkép export | előnézet + jobb oldali sáv: PNG, JPEG, PDF, vágólap | Kutatás: [Excalidraw export](https://refero.design/pages/4f3a60e5-0f88-4092-9735-3a10bee4cc7d) (kutatas/eredmenyek.md). |
 | Vizuális irány | a 2. munkacsomag állítja be a `refero-design` skillel; addig semleges tokenek egy fájlban | A dizájnkutatás útja: előbb vizuális irány, utána a felületek. |
-| Hosszú companion munkák | a companion a felirat- és képsor-munkát külön folyamatban futtatja job-azonosítóval, és a munka a port lezárulása után is fut; a kiegészítő újracsatlakozáskor `job.status`-szal kérdez rá, és az a port szakadása alatt keletkezett szegmenseket is visszaadja, így a felirat nem lesz lyukas. A portot a panel vagy egy offscreen dokumentum tartja nyitva, nem a háttér service worker | A Chrome bezárja a portot és leállítja a hostot, ha a hívó service worker leáll; percekig tartó átírás így elveszne. |
+| Hosszú companion munkák | a companion a felirat- és képsor-munkát külön folyamatban futtatja job-azonosítóval, és a munka a port lezárulása után is fut; a kiegészítő újracsatlakozáskor `job.status`-szal kérdez rá, és az a port szakadása alatt keletkezett szegmenseket is visszaadja, így a felirat nem lesz lyukas. A hosszú életű portot a panel tartja nyitva (offscreen dokumentumban nincs `connectNative`, a service workerből nyitott port a SW leállásakor megszakad; az 1. csomag próbája szerint). Ha a panel zárva van, a háttér `chrome.runtime.sendNativeMessage` hívással kérdezi a `job.status`-t, amíg a munka fut; ehhez a companion a munkák állapotát fájlban tartja (`%LOCALAPPDATA%\Siteview\jobs`), így bármelyik hostpéldány válaszolni tud | A Chrome bezárja a portot és leállítja a hostot, ha a hívó service worker leáll; percekig tartó átírás így elveszne. |
 | Tesztelhetőség | minden felhasználói indítás (helyi menü, billentyűparancs, gyorsgomb) egy közös `runAction(név, adatok)` háttérüzenetet hív; az e2e ezt hívja közvetlenül. A panel e2e-ben `chrome-extension://<id>/sidepanel.html` lapként nyílik. Letöltés e2e-ben `saveAs: false` mellett, a Playwright letöltési mappájában ellenőrizve. A helyi menü és a parancs bekötését Vitest ellenőrzi (a regisztrált menüpont és parancs a jó `runAction`-t hívja) | A Playwright nem tud böngésző-helyi menüre kattintani, `chrome.commands` billentyűt kiváltani és az eszköztár-ikonra kattintani. |
 
 ## Részletes működés modulonként
@@ -100,7 +100,7 @@ videóinak letöltése; DRM-védett videó.
 - Billentyűparancs: `Alt+Shift+P` képernyőkép, `Alt+Shift+S` panel megnyitása (a Chrome `commands` alapján,
   felülírható a `chrome://extensions/shortcuts` oldalon).
 - Jogosultságok: `tabs`, `tabGroups`, `storage`, `unlimitedStorage`, `alarms`, `contextMenus`, `sidePanel`,
-  `downloads`, `scripting`, `offscreen`, `nativeMessaging`, `debugger` (képernyőkép), `webRequest` (felirat tartalék, HLS/DASH képsáv),
+  `downloads`, `scripting`, `nativeMessaging`, `debugger` (képernyőkép), `webRequest` (felirat tartalék, HLS/DASH képsáv),
   `cookies` (felirat tartalék), host: `<all_urls>`. Most mind kötelező; publikáláskor a modulhoz kötöttek
   (`debugger`, `webRequest`, `cookies`, `nativeMessaging`) `optional_permissions`-be kerülnek, és a modul
   bekapcsolásakor kéri őket.
@@ -283,7 +283,7 @@ vizuális irányt használják.
 
 | # | Mit | Függ ettől | Párhuzamosítható | Ellenőrzés (parancs vagy lépés) |
 | --- | --- | --- | --- | --- |
-| 1 | **Próba.** WXT váz, rögzített `key`, mag (modulregiszter, beállítások sync, `runAction`, oldalpanel héj semleges tokenekkel, helyi menü keret), oldalpanel alap tablista (TS1 csoportfejlécekkel), Altatás modul `beforeDiscard` horoggal; CI (GitHub Actions: build, Vitest, Playwright Chromiummal). Kockázati próbák: (a) `chrome.debugger.attach` működik-e Playwright alatt; (b) hamis native host bekötése Linux CI-ban (`~/.config/chromium/NativeMessagingHosts/`, rögzített azonosítóval); (c) nyitott native port a panelből és egy offscreen dokumentumból (ha ott elérhető a `connectNative`), a service worker leállása után is él-e; a nyertes út lesz a portgazda | – | – | Vitest: kivétel-logika, időzítés; e2e: tablista megjelenik; tesztidővel (1 perc) altat; rögzített, hangot játszó, kitöltött űrlapos tab nem altat; ATD10 YouTube-szerű tesztoldalon `t=` bekerül; a három próba eredménye a PR-ban (ha (a) nem megy, a 6. csomag e2e-je a tartalék utat teszteli; ha (b) nem megy, a 10–11. csomag e2e-je transport-absztrakció mögötti hamis hosttal fut); CI zöld |
+| 1 | **Próba.** WXT váz, rögzített `key`, mag (modulregiszter, beállítások sync, `runAction`, oldalpanel héj semleges tokenekkel, helyi menü keret), oldalpanel alap tablista (TS1 csoportfejlécekkel), Altatás modul `beforeDiscard` horoggal; CI (GitHub Actions: build, Vitest, Playwright Chromiummal). Kockázati próbák: (a) `chrome.debugger.attach` működik-e Playwright alatt; (b) hamis native host bekötése Linux CI-ban (a Playwright profilmappájában: `<user-data-dir>/NativeMessagingHosts/`, rögzített azonosítóval); (c) nyitott native port a panelből és egy offscreen dokumentumból (ha ott elérhető a `connectNative`), a service worker leállása után is él-e; a nyertes út lesz a portgazda (eredmény: a panel, lásd v1.1) | – | – | Vitest: kivétel-logika, időzítés; e2e: tablista megjelenik; tesztidővel (1 perc) altat; rögzített, hangot játszó, kitöltött űrlapos tab nem altat; ATD10 YouTube-szerű tesztoldalon `t=` bekerül; a három próba eredménye a PR-ban (ha (a) nem megy, a 6. csomag e2e-je a tartalék utat teszteli; ha (b) nem megy, a 10–11. csomag e2e-je transport-absztrakció mögötti hamis hosttal fut); CI zöld |
 | 2 | Vizuális irány a `refero-design` skillel: tokenek, tipográfia, közös komponensek (lista sor, kapcsoló, lenyíló, HUD, lépésjelző); `kutatas/vizualis-irany.md` | 1 | – | a panel és egy tesztoldal HUD-ja világos és sötét módban képernyőképpel a PR-ban; e2e zöld |
 | 3 | Oldalpanel teljes: TS2, TS3, TS4 (cím/URL keresés, szűrő lenyíló, üres állapot), TS5, TS10, TS11, gyorsgomb sor | 2 | 4-gyel | e2e: szabály szerint csoportosít; munkamenet ment/visszaállít; keresés szűr; kijelölt tabok rendezése a böngészőben is; URL ráhúzása tabot nyit |
 | 4 | Duplikátumok + linkjelölés | 2 | 3-mal, 5-tel | Vitest: normalizálás (táblázatos esetek); e2e: duplikátum → régi tab aktív, új bezárul; aktív védelem; „Megnyitás kivételként”; linkjelölés megjelenik és eltűnik a tab bezárásakor |
@@ -341,3 +341,6 @@ Automatikusan (Playwright, hamis companion hosttal; a helyi menü és a billenty
   tesztelhetőség `runAction`-nel, hosszú companion munkák jobként, IndexedDB a kiegészítő oldalán, `claude -p`
   kapcsolók, kockázati próbák az 1. csomagban, yt-dlp az elsődleges hangforrás, jogosultságlista, a tekerési
   előnézet forrásainak pontosítása. Jóváhagyva 2026-10-22-én, a #1 merge-ével.
+- v1.1 2026-10-22: az 1. csomag próbái alapján: a native port gazdája a panel (offscreen út kiesik, `offscreen`
+  jogosultság törölve), zárt panelnél `sendNativeMessage` + fájlban tartott job-állapot; a hamis native host CI-útvonala
+  a Playwright profilmappája. Jóváhagyva a PR merge-ével.
