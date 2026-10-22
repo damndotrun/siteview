@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="hu">
+  <head>
+    <meta charset="UTF-8" />
+    <title>YouTube-szerű nézőoldal</title>
+  </head>
+  <body>
+    <!-- A teszt a www.youtube.com nevet a helyi szerverre irányítja (--host-resolver-rules). -->
+    <video id="video" src="/hang.wav" muted></video>
+    <script>
+      const video = document.getElementById('video');
+      video.addEventListener('loadedmetadata', () => {
+        video.currentTime = Number(new URLSearchParams(location.search).get('ugras') || 0);
+      });
+      video.addEventListener('seeked', () => (document.title = `YouTube-szerű nézőoldal ${Math.floor(video.currentTime)}`));
+    </script>
+  </body>
+</html>

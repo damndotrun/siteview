@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="hu">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Szüneteltetett lejátszó</title>
+  </head>
+  <body>
+    <audio id="lejatszo" src="/hang.wav" controls></audio>
+    <script>
+      // Elindul, majd megáll: currentTime > 0 és paused.
+      const audio = document.getElementById('lejatszo');
+      audio.volume = 0.05;
+      audio.play().then(() =>
+        setTimeout(() => {
+          audio.pause();
+          document.title = 'Szüneteltetett lejátszó (kész)';
+        }, 600),
+      );
+    </script>
+  </body>
+</html>
