@@ -1,5 +1,5 @@
 # Siteview: saját böngésző-kiegészítő
-Verzió: 1 · 2026-10-21 · Állapot: tervezet
+Verzió: 1 · 2026-10-22 · Állapot: jóváhagyva (#1 merge)
 
 ## Cél és kész-feltétel
 
@@ -340,4 +340,4 @@ Automatikusan (Playwright, hamis companion hosttal; a helyi menü és a billenty
   alapján. Jóváhagyás előtt még bekerült: VD8 tekerési előnézet (Karesz kérésére); a két független review kör után
   tesztelhetőség `runAction`-nel, hosszú companion munkák jobként, IndexedDB a kiegészítő oldalán, `claude -p`
   kapcsolók, kockázati próbák az 1. csomagban, yt-dlp az elsődleges hangforrás, jogosultságlista, a tekerési
-  előnézet forrásainak pontosítása.
+  előnézet forrásainak pontosítása. Jóváhagyva 2026-10-22-én, a #1 merge-ével.

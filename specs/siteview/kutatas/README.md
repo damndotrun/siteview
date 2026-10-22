@@ -1,5 +1,5 @@
 # Dizájnkutatás: Siteview
-Spec: specs/siteview/SPEC.md v1 (tervezet) · 2026-10-21
+Spec: specs/siteview/SPEC.md v1 (jóváhagyva) · 2026-10-21
 
 ## Állapot
 - Spec: nincs jóváhagyott; a KAPU 1 funkciólistája alapján (Karesz válogatása, 69 funkció) készült.
