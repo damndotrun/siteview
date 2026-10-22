@@ -1,4 +1,4 @@
-import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { test as base, chromium, expect, type BrowserContext, type Page, type Worker } from '@playwright/test';
@@ -11,6 +11,8 @@ export const EXTENSION_ID = 'bpeghpddlcamabdbmkekdoccaogngenl';
 export const NATIVE_HOST_NAME = 'com.siteview.companion';
 export const EXTENSION_PATH = resolve(import.meta.dirname, '..', '..', '.output', 'chrome-mv3');
 export const FAKE_HOST_PATH = resolve(import.meta.dirname, '..', 'fake-host', 'host.mjs');
+/** A Chrome saját letöltési mappája a profilmappán belül. */
+export const DOWNLOADS_DIR = 'Letoltesek';
 
 export interface TabState {
   id: number;
@@ -60,7 +62,15 @@ export const test = base.extend<Fixtures, WorkerFixtures>({
   nativeHost: [false, { option: true }],
 
   userDataDir: async ({}, use) => {
-    await use(mkdtempSync(join(tmpdir(), 'siteview-e2e-')));
+    const dir = mkdtempSync(join(tmpdir(), 'siteview-e2e-'));
+    // A Chrome saját letöltési mappája a profilon belül (ha egy teszt a Playwright helyett a Chrome-ra bízza
+    // a letöltést, lásd `useChromeDownloads`), kérdés nélkül.
+    mkdirSync(join(dir, 'Default'), { recursive: true });
+    writeFileSync(
+      join(dir, 'Default', 'Preferences'),
+      JSON.stringify({ download: { default_directory: join(dir, DOWNLOADS_DIR), prompt_for_download: false } }),
+    );
+    await use(dir);
   },
 
   context: async ({ fixtureServer, nativeHost, userDataDir }, use) => {
@@ -157,4 +167,36 @@ export async function setSettings(panel: Page, moduleId: string, patch: Record<s
     },
     [moduleId, patch] as const,
   );
+}
+
+export interface DownloadedFile {
+  /** A fájl teljes útvonala a lemezen. */
+  path: string;
+  mime: string;
+  bytes: Buffer;
+}
+
+/**
+ * Megvárja, hogy a `chrome.downloads` letöltés befejeződjön, és beolvassa a fájlt. Alapból a Playwright
+ * letöltési mappájába kerül (a Playwright a nevet azonosítóra cseréli); `useChromeDownloads` után a Chrome
+ * saját mappájába, a kért névvel.
+ */
+export async function downloadedFile(panel: Page, downloadId: number): Promise<DownloadedFile> {
+  let item: { state: string; filename: string; mime: string; error?: string } | undefined;
+  await expect
+    .poll(async () => {
+      [item] = await panel.evaluate((id) => chrome.downloads.search({ id }), downloadId);
+      return item?.state;
+    })
+    .toBe('complete');
+  return { path: item!.filename, mime: item!.mime, bytes: readFileSync(item!.filename) };
+}
+
+/**
+ * A letöltést a Chrome saját letöltéskezelőjére bízza (a Playwright felülírása a kiegészítő által kért
+ * fájlnevet figyelmen kívül hagyja). A fájlok a profil `DOWNLOADS_DIR` mappájába kerülnek.
+ */
+export async function useChromeDownloads(context: BrowserContext, page: Page) {
+  const cdp = await context.newCDPSession(page);
+  await cdp.send('Browser.setDownloadBehavior', { behavior: 'default' });
 }

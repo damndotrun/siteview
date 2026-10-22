@@ -104,10 +104,38 @@ describe('mag: runAction, helyi menü, parancs', () => {
 
     vi.mocked(fakeBrowser.contextMenus.create).mockClear();
     await fakeBrowser.storage.sync.set({ [settingsKey('altatas')]: { enabled: false } });
+    const partly = createCore(BACKGROUND_MODULES, {});
+    await partly.loadEnabled();
+    await partly.syncMenus();
+    const remaining = vi.mocked(fakeBrowser.contextMenus.create).mock.calls.map(([item]) => item.id);
+    expect(remaining).toContain('kepmentes:save-jpg');
+    expect(remaining.some((id) => String(id).startsWith('altatas:'))).toBe(false);
+
+    vi.mocked(fakeBrowser.contextMenus.create).mockClear();
+    await fakeBrowser.storage.sync.set({ [settingsKey('kepmentes')]: { enabled: false } });
     const off = createCore(BACKGROUND_MODULES, {});
     await off.loadEnabled();
     await off.syncMenus();
     expect(fakeBrowser.contextMenus.create).not.toHaveBeenCalled();
+  });
+
+  it('SI1: a képen megjelenő két menüpont a JPG és a PNG mentést hívja a kép címével', async () => {
+    const { modules, spies } = spiedModules();
+    const core = createCore(modules, {});
+    await core.loadEnabled();
+    await core.syncMenus();
+    const created = vi.mocked(fakeBrowser.contextMenus.create).mock.calls.map(([item]) => item);
+    for (const [id, title, action] of [
+      ['kepmentes:save-jpg', 'Mentés JPG-ként', 'kepmentes.saveJpg'],
+      ['kepmentes:save-png', 'Mentés PNG-ként', 'kepmentes.savePng'],
+    ] as const) {
+      expect(created.find((item) => item.id === id)).toMatchObject({ title, contexts: ['image'], parentId: ROOT_MENU_ID });
+      const info = { menuItemId: id, srcUrl: 'https://a.hu/k.webp', pageUrl: 'https://a.hu/' };
+      await core.handleMenuClick(info as never, { id: 4, windowId: 1 } as never);
+      expect(spies.get(action)).toHaveBeenLastCalledWith(
+        expect.objectContaining({ tabId: 4, info: expect.objectContaining({ srcUrl: 'https://a.hu/k.webp', pageUrl: 'https://a.hu/' }) }),
+      );
+    }
   });
 
   it('az Altatás percenkénti ébresztője csak bekapcsolt modulnál él', async () => {

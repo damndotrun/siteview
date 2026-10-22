@@ -8,6 +8,8 @@ const TYPES: Record<string, string> = {
   '.wav': 'audio/wav',
   '.js': 'text/javascript',
   '.css': 'text/css',
+  '.png': 'image/png',
+  '.webp': 'image/webp',
 };
 
 // A YouTube-szerű útvonal: a www.youtube.com/watch ide fut be a --host-resolver-rules miatt.
@@ -16,7 +18,15 @@ const ROUTES: Record<string, string> = { '/watch': 'youtube-watch.html' };
 /** Kis statikus szerver a `tests/fixtures/` mappára, Range-kéréssel (a médiaugráshoz). */
 export async function startFixtureServer(): Promise<{ server: Server; port: number; url: (path: string) => string }> {
   const server = createServer((request, response) => {
-    const { pathname } = new URL(request.url ?? '/', 'http://localhost');
+    let { pathname } = new URL(request.url ?? '/', 'http://localhost');
+    // Hotlink-védelem utánzása: a `/vedett/` alatti fájl csak weboldalról jövő (Referer-es) kérésre jön.
+    if (pathname.startsWith('/vedett/')) {
+      if (!request.headers.referer?.startsWith('http')) {
+        response.writeHead(403).end('hotlink');
+        return;
+      }
+      pathname = pathname.slice('/vedett'.length);
+    }
     const file = normalize(join(ROOT, ROUTES[pathname] ?? pathname));
     let size: number;
     try {
