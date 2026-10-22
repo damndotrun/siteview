@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="hu">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Tesztoldal</title>
+    <script>
+      // A cím a ?cim= paraméterből jön, így egy fájl több tabot ad.
+      document.title = new URLSearchParams(location.search).get('cim') || 'Tesztoldal';
+    </script>
+  </head>
+  <body>
+    <h1>Tesztoldal</h1>
+    <p>Sima oldal az e2e tesztekhez.</p>
+  </body>
+</html>

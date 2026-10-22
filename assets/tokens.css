@@ -1,0 +1,55 @@
+/*
+ * Semleges tokenek, egy helyen. A 2. munkacsomag (vizuális irány) cseréli le őket;
+ * addig minden felület csak ezeket a változókat használja.
+ */
+:root {
+  color-scheme: light dark;
+
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-size-sm: 12px;
+  --font-size-md: 13px;
+  --font-size-lg: 15px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --radius: 6px;
+  --row-height: 30px;
+
+  --color-bg: #ffffff;
+  --color-surface: #f4f4f5;
+  --color-border: #e4e4e7;
+  --color-text: #18181b;
+  --color-text-muted: #71717a;
+  --color-accent: #2563eb;
+  --color-accent-text: #ffffff;
+  --color-warning-bg: #fef9c3;
+  --color-warning-text: #713f12;
+  --opacity-discarded: 0.5;
+
+  /* A Chrome tabcsoport színei. */
+  --group-grey: #5f6368;
+  --group-blue: #1a73e8;
+  --group-red: #d93025;
+  --group-yellow: #f9ab00;
+  --group-green: #1e8e3e;
+  --group-pink: #d01884;
+  --group-purple: #9334e6;
+  --group-cyan: #007b83;
+  --group-orange: #fa903e;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #18181b;
+    --color-surface: #27272a;
+    --color-border: #3f3f46;
+    --color-text: #f4f4f5;
+    --color-text-muted: #a1a1aa;
+    --color-accent: #60a5fa;
+    --color-accent-text: #0b1220;
+    --color-warning-bg: #422006;
+    --color-warning-text: #fde68a;
+  }
+}

@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="hu">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hangot játszik</title>
+  </head>
+  <body>
+    <p>Folyamatos hang (WebAudio), hogy a tab „audible” legyen.</p>
+    <script>
+      const context = new AudioContext();
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+      gain.gain.value = 0.05;
+      oscillator.connect(gain).connect(context.destination);
+      oscillator.start();
+    </script>
+  </body>
+</html>
