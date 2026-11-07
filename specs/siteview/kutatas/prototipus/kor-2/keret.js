@@ -1,15 +1,12 @@
 // A prototípus kerete: böngészőablak, aktuális oldal, a Chrome oldalpanel fejléce és az állapotváltó.
-// Nem része az iránynak; az irány a panel tartalmát (render) és a videón a HUD-ot (hud) rajzolja.
+// Nem része az iránynak. A panel működése a közös `mukodes.js` (M), a panel és a HUD rajza az irányé.
 window.Keret = (function () {
   const STATES = [
-    ['lista', 'Lista'], ['kereses', 'Keresés'], ['ures', 'Nincs találat'],
-    ['osszefoglalo', 'Összefoglaló'], ['video', 'Videó'], ['felirat', 'Felirat'],
+    ['lista', 'Lista'], ['kereses', 'Keresés'], ['ures', 'Nincs találat'], ['szuro', 'Szűrő'], ['kijeloles', 'Kijelölés'],
+    ['osszefoglalo', 'Összefoglaló'], ['video', 'Videó'], ['felirat', 'Felirat'], ['atirat', 'Átirat'],
   ];
-  // A keresés állapot alapszava: két ok (cím, szöveg) és két ablak egyszerre.
-  const QUERY = { kereses: 'légcsatorna', ures: 'dyson v15' };
   const video = { vol: 65, t: 724, dur: 2470, speed: 1.5, playing: true };
-  let dir = null;
-  let opened = null; // a panelből megnyitott tab (találatra kattintás)
+  let dir = null, hideTimer = null, hudEv = null;
 
   function fmt(s) { s = Math.max(0, Math.round(s)); const m = Math.floor(s / 60), r = s % 60; return `${m}:${String(r).padStart(2, '0')}`; }
 
@@ -26,8 +23,7 @@ window.Keret = (function () {
     const body = t.text ? SV.mark(t.text, q || '', 'find') : '';
     return `<div class="article"><div class="crumbs">${SV.esc(SV.domain(t.url))}</div><h1>${SV.esc(t.title)}</h1><p>${body}</p></div>`;
   }
-  function videoPage(withSub) {
-    const sub = withSub ? `<div class="sub" data-sv="sub">${SV.esc(SV.subtitle.line)}</div>` : '';
+  function videoPage() {
     return `<div class="vpage">
       <div class="video" data-video>
         <div class="slide"><h2>One hour of English audio, laptop CPU</h2>
@@ -36,7 +32,6 @@ window.Keret = (function () {
           <div class="bar"><span>faster-whisper int8 + VAD</span><i style="width:5%"></i><span>5 min</span></div>
           <div class="note">Intel i5-1240P · 4 threads · beam size 5</div></div>
         <span class="ph">videókép: kódban rajzolt helykitöltő</span>
-        ${sub}
         <div class="native"><span>${video.playing ? '❚❚' : '▶'}</span><div class="track"><b style="width:${(video.t / video.dur) * 100}%"></b></div><span>${fmt(video.t)} / ${fmt(video.dur)}</span></div>
         <div data-hud></div>
       </div>
@@ -48,71 +43,90 @@ window.Keret = (function () {
 
   function render() {
     const state = current();
-    opened = null;
-    const isVideo = state === 'video' || state === 'felirat';
-    const active = isVideo ? SV.tabs.find((t) => t.id === 8) : SV.tabs.find((t) => t.id === 3);
-    SV.tabs.forEach((t) => { t.active = t.id === active.id; });
-    document.querySelector('.url').textContent = active.url;
-    document.querySelectorAll('.proto a').forEach((a) => a.classList.toggle('on', a.getAttribute('href') === '#' + state));
+    Object.assign(video, { vol: 65, t: 724, speed: 1.5, playing: true });
+    hudEv = null; clearTimeout(hideTimer);
+    M.setup(state);
+    const a = M.active();
+    document.querySelector('.url').textContent = a.url;
+    document.querySelectorAll('.proto a[href^="#"]').forEach((x) => x.classList.toggle('on', x.getAttribute('href') === '#' + state));
     const page = document.querySelector('.page');
-    page.innerHTML = isVideo ? videoPage(state === 'felirat') : articlePage();
-    dir.render(state, document.querySelector('.panel-body'), { activeId: active.id, query: QUERY[state] || '' });
-    if (isVideo) bindVideo(page.querySelector('[data-video]'), state);
-    setBadge(state === 'felirat' && dir.badge ? dir.badge() : null);
+    page.innerHTML = a.id === M.VIDEO_TAB ? videoPage() : articlePage();
+    if (a.id === M.VIDEO_TAB) bindVideo(page.querySelector('[data-video]'));
+    M.mount(dir, document.querySelector('.panel-body'));
   }
-  // Az ikon jelvénye: az irány adja a színt; szöveg a felirat állapota.
+  // Az ikon jelvénye (SG6): az irány adja a színt, a szöveg a felirat állapota.
   function setBadge(b) {
     const el = document.querySelector('.ext-badge'); if (!el) return;
     el.hidden = !b; if (!b) return;
     el.textContent = b.text; el.style.background = b.bg; el.style.color = b.fg;
   }
 
-  // A panel hívja, ha egy tabra kattintottak: a tab aktív lesz, az oldal a talált szövegnél nyílik.
+  // A panel hívja, ha egy tabra kattintottak: a tab aktív lesz, az oldal a talált szövegnél nyílik (TC3).
   function openTab(t, q) {
-    opened = t;
     SV.tabs.forEach((x) => { x.active = x.id === t.id; });
     const wasDiscarded = !!t.discarded;
-    t.discarded = false; t.unread = false; t.last = 0;
+    t.discarded = false; t.last = 0;
     document.querySelector('.url').textContent = t.url;
     const page = document.querySelector('.page');
+    hudEv = null;
     if (t.id === 3) page.innerHTML = articlePage();
-    else if (t.id === 8) { page.innerHTML = videoPage(false); bindVideo(page.querySelector('[data-video]'), 'video'); }
+    else if (t.id === M.VIDEO_TAB) { page.innerHTML = videoPage(); bindVideo(page.querySelector('[data-video]')); }
     else page.innerHTML = tabPage(t, q);
     const hit = page.querySelector('mark.find'); if (hit) hit.scrollIntoView({ block: 'center' });
     return { wasDiscarded };
   }
 
-  let hideTimer;
-  function bindVideo(el, state) {
+  function sync() {
+    const el = document.querySelector('[data-video]'); if (!el) return;
+    const b = el.querySelector('.native b'); if (b) b.style.width = (video.t / video.dur) * 100 + '%';
+    const tt = el.querySelector('.native span:last-child'); if (tt) tt.textContent = `${fmt(video.t)} / ${fmt(video.dur)}`;
+    const pp = el.querySelector('.native span:first-child'); if (pp) pp.textContent = video.playing ? '❚❚' : '▶';
+  }
+  function seek(t) { video.t = Math.max(0, Math.min(video.dur, t)); sync(); refreshSub(); }
+  // A generált felirat sora a videón (SG4): csak ha a lejátszás helyéig már átíródott.
+  function refreshSub() {
+    const el = document.querySelector('[data-video]'); if (!el) return;
+    const line = M.subLine(video.t);
+    let s = el.querySelector('[data-sv="sub"]');
+    if (!line) { if (s) s.remove(); return; }
+    if (!s) { el.querySelector('[data-hud]').insertAdjacentHTML('beforebegin', '<div class="sub" data-sv="sub"></div>'); s = el.querySelector('[data-sv="sub"]'); }
+    s.textContent = line;
+  }
+  // A HUD: az irány rajzolja a közös tartalomból (M.hudModel). 1,1 mp után eltűnik, ha nem áll rajta az egér.
+  function paintHud() {
+    const el = document.querySelector('[data-video]'); if (!el) return;
+    el.querySelector('[data-hud]').innerHTML = dir.hudHTML(M.hudModel(video, hudEv), fmt);
+  }
+  function showHud(ev) {
+    hudEv = ev; paintHud();
+    clearTimeout(hideTimer);
+    if (ev && !ev.frozen) hideTimer = setTimeout(hideLater, 1100);
+  }
+  function hideLater() {
+    const hud = document.querySelector('[data-hud]');
+    if (hud && hud.matches(':hover')) { hideTimer = setTimeout(hideLater, 600); return; }
+    hudEv = null; paintHud();
+  }
+  function bindVideo(el) {
     const hud = el.querySelector('[data-hud]');
-    const ctx = { el, hud, video, fmt, state };
-    const mode = state === 'felirat' ? 'felirat' : 'video';
-    dir.hud && dir.hud(ctx, mode, null);
-    function sync() {
-      const b = el.querySelector('.native b'); if (b) b.style.width = (video.t / video.dur) * 100 + '%';
-      const tt = el.querySelector('.native span:last-child'); if (tt) tt.textContent = `${fmt(video.t)} / ${fmt(video.dur)}`;
-      const pp = el.querySelector('.native span:first-child'); if (pp) pp.textContent = video.playing ? '❚❚' : '▶';
-    }
+    hud.addEventListener('click', (e) => { const b = e.target.closest('[data-op]'); if (b) { e.stopPropagation(); M.op(b.dataset.op, b.dataset.arg); } });
     el.addEventListener('wheel', (e) => {
+      if (e.target.closest('[data-hud] button')) return;
       e.preventDefault();
       const r = el.getBoundingClientRect();
       const side = e.clientX - r.left < r.width / 2 ? 'bal' : 'jobb';
       const step = e.deltaY < 0 ? 1 : -1;
-      if (e.shiftKey) { video.speed = Math.max(0.25, Math.min(3, Math.round((video.speed + 0.25 * step) * 100) / 100)); }
-      else if (side === 'bal') video.vol = Math.max(0, Math.min(100, video.vol + 5 * step));
-      else video.t = Math.max(0, Math.min(video.dur, video.t + 5 * step));
-      sync();
-      dir.hud(ctx, mode, { side: e.shiftKey ? 'sebesseg' : side, step });
-      clearTimeout(hideTimer);
-      hideTimer = setTimeout(() => dir.hud(ctx, mode, null), 1100);
+      if (side === 'bal') video.vol = Math.max(0, Math.min(100, video.vol + 5 * step)); // VD2: bal fél görgő = hangerő ±5%
+      else video.t = Math.max(0, Math.min(video.dur, video.t + 5 * step)); // jobb fél görgő = ugrás ±5 mp
+      sync(); refreshSub();
+      showHud({ side, step });
     }, { passive: false });
     el.addEventListener('mousedown', (e) => {
-      if (e.button !== 1) return;
+      if (e.button !== 1) return; // középső gomb = lejátszás/szünet
       e.preventDefault(); video.playing = !video.playing; sync();
-      dir.hud(ctx, mode, { side: 'kozep' });
-      clearTimeout(hideTimer);
-      hideTimer = setTimeout(() => dir.hud(ctx, mode, null), 1100);
+      showHud({ side: 'kozep' });
     });
+    paintHud(); refreshSub();
   }
 
   function init(direction) {
@@ -130,15 +144,12 @@ window.Keret = (function () {
     window.addEventListener('hashchange', render);
     render();
   }
-  // Teszteléshez: egy HUD-állapot rögzítése képernyőképhez.
+  // Teszteléshez: egy HUD-állapot rögzítése képernyőképhez, és az időzítők megállítása.
   function freezeHud(side) {
-    const el = document.querySelector('[data-video]'); if (!el) return;
-    clearTimeout(hideTimer);
-    const hud = el.querySelector('[data-hud]');
+    M.freeze();
     if (side === 'bal') video.vol = 70; else if (side === 'jobb') video.t = 729;
-    const b = el.querySelector('.native b'); if (b) b.style.width = (video.t / video.dur) * 100 + '%';
-    const tt = el.querySelector('.native span:last-child'); if (tt) tt.textContent = `${fmt(video.t)} / ${fmt(video.dur)}`;
-    dir.hud({ el, hud, video, fmt, state: current() }, current() === 'felirat' ? 'felirat' : 'video', { side, step: 1, frozen: true });
+    sync(); refreshSub();
+    showHud({ side, step: 1, frozen: true });
   }
-  return { init, video, fmt, freezeHud, openTab, setBadge, current, QUERY, rerender: render, go: (s) => { location.hash = s; } };
+  return { init, video, fmt, freezeHud, openTab, setBadge, current, seek, refreshSub, paintHud, rerender: render, go: (s) => { location.hash = s; } };
 })();

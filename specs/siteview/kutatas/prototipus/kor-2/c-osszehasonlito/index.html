@@ -9,302 +9,279 @@
 /* C irány tokenjei: vizualis-irany.md „C irány” Tokenek. Csak ezek használhatók. */
 :root {
   --c-bg:#ffffff; --c-tools:#f8f8f8; --c-border:#e8e8e8; --c-text:#1a1a1a; --c-value:#2b2b2b; --c-label:#a8a8a8;
-  --c-crumb:#8a8a8a; --c-seg:#f0f0f0; --c-btn2:#f2f2f2; --c-primary:#161616; --c-icon:#6b6b6b; --c-hit:#f6e3d1;
-  --c-pop-shadow:0 6px 20px rgba(0,0,0,.08);
+  --c-crumb:#8a8a8a; --c-dim:#8a8a8a; --c-btn2:#f2f2f2; --c-primary:#161616; --c-icon:#6b6b6b;
+  --c-hit:#f6e3d1; --c-hover:#f8f8f8; --c-pop-shadow:0 6px 20px rgba(0,0,0,.08);
   --c-font:"Segoe UI",system-ui,sans-serif; --c-title:600 13px/1.3 var(--c-font); --c-value-font:400 13px/1.2 var(--c-font);
   --c-label-font:600 9px/1.2 var(--c-font); --c-radius:4px; --c-radius-btn:6px;
 }
 .c { container-type: inline-size; position: relative; display: flex; flex-direction: column; height: 100%; background: var(--c-bg); color: var(--c-text); font: 400 13px/1.35 var(--c-font); }
+button { font: inherit; color: inherit; }
+/* Morzsamenü: ablak / csoport, mindkettő lenyíló (Programa „Projects / … / Untitled schedule ▾”) */
 .bc { flex: none; display: flex; align-items: center; gap: 6px; height: 44px; padding: 0 8px 0 14px; color: var(--c-crumb); white-space: nowrap; }
-.bc .cur { color: var(--c-text); font-weight: 600; display: inline-flex; align-items: center; gap: 3px; border: 0; background: none; padding: 0; font: 600 13px/1 var(--c-font); cursor: pointer; }
-.bc .sp { flex: 1; }
-.ib { width: 28px; height: 28px; display: grid; place-items: center; border: 0; background: none; color: var(--c-icon); cursor: pointer; border-radius: var(--c-radius); }
-.tools { flex: none; position: relative; display: flex; align-items: center; gap: 4px; padding: 0 8px 10px 14px; }
-.seg { display: inline-flex; padding: 2px; background: var(--c-seg); border-radius: var(--c-radius-btn); }
-.seg button { border: 1px solid transparent; background: none; padding: 4px 9px; font: 400 12px/1 var(--c-font); color: var(--c-crumb); border-radius: var(--c-radius); cursor: pointer; }
-.seg button.on { background: var(--c-bg); border-color: var(--c-border); color: var(--c-text); font-weight: 600; }
-.tools .sp { flex: 1; }
+.bc .cr { display: inline-flex; align-items: center; gap: 4px; border: 0; background: none; padding: 0; font: 400 13px/1 var(--c-font); color: var(--c-crumb); cursor: pointer; min-width: 0; }
+.bc .cr:hover { color: var(--c-text); }
+.bc .cr.cur, .bc .cur { font-weight: 600; color: var(--c-text); }
+.bc .cr i { width: 6px; height: 6px; border-radius: 50%; flex: none; }
+.bc .sp, .tools .sp { flex: 1; }
+.kbd { font: 400 11px/1 var(--c-font); color: var(--c-label); }
+.ib { flex: none; width: 28px; height: 28px; display: grid; place-items: center; border: 0; background: none; color: var(--c-icon); cursor: pointer; border-radius: var(--c-radius); }
+.ib:hover { color: var(--c-text); }
+.ib.sm { width: 22px; height: 22px; }
+/* Eszközsor: szöveges ikongombok (Programa „Search · Filter · Sort”) */
+.tools { flex: none; display: flex; align-items: center; gap: 4px; min-height: 40px; padding: 0 8px 6px 14px; }
+.tools .cnt { color: var(--c-crumb); font-size: 12px; }
 .tb { display: inline-flex; align-items: center; gap: 5px; border: 0; background: none; padding: 5px 6px; font: 400 12px/1 var(--c-font); color: var(--c-icon); cursor: pointer; border-radius: var(--c-radius); white-space: nowrap; }
+.tb:hover { color: var(--c-text); }
 .tb.on { color: var(--c-text); font-weight: 600; }
+.tb .nf { font-weight: 600; color: var(--c-text); }
 @container (max-width: 360px) { .tools .tb .lb { display: none; } .foot .tb .lb { display: none; } }
 @container (min-width: 361px) and (max-width: 460px) { .foot .tb .li { display: none; } }
-.sbox { flex: 1; min-width: 0; display: flex; align-items: center; gap: 6px; height: 30px; padding: 0 8px; border: 1px solid var(--c-border); border-radius: var(--c-radius); color: var(--c-icon); }
+.sbox { flex: 1; min-width: 0; display: flex; align-items: center; gap: 6px; height: 30px; padding: 0 2px 0 8px; border: 1px solid var(--c-border); border-radius: var(--c-radius); color: var(--c-icon); }
 .sbox input { flex: 1; min-width: 0; border: 0; outline: 0; font: 400 13px/1 var(--c-font); color: var(--c-text); background: none; }
-.chips { flex: none; display: flex; flex-wrap: wrap; gap: 6px; padding: 0 14px 10px; }
-.chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 4px 3px 8px; background: var(--c-btn2); border-radius: var(--c-radius); font: 400 12px/1 var(--c-font); color: var(--c-value); }
+/* Bekapcsolt szűrők: másodlagos gombok (Programa „Bulk Quotes”), × kikapcsol */
+.chips { flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 0 14px 10px; }
+.chip { display: inline-flex; align-items: center; gap: 4px; padding: 4px 4px 4px 8px; background: var(--c-btn2); border-radius: var(--c-radius); font: 400 12px/1 var(--c-font); color: var(--c-value); }
 .chip button { border: 0; background: none; padding: 0; display: grid; color: var(--c-icon); cursor: pointer; }
 .list { flex: 1; min-height: 0; overflow: auto; padding: 0 10px 16px 14px; }
-.sh { display: flex; align-items: center; gap: 7px; margin: 12px 0 8px; font: 600 12px/1 var(--c-font); color: var(--c-text); }
+.wl { margin: 14px 0 0; font: 600 13px/1 var(--c-font); color: var(--c-text); }
+.wl .n { font-weight: 400; color: var(--c-crumb); }
+/* Szakaszcím: a Chrome-csoport, nyíllal összecsukható (Programa oldalsáv „⌄ Mid-century modern bedr…”) */
+.sh { display: flex; align-items: center; gap: 6px; margin: 12px 0 8px; font: 600 12px/1 var(--c-font); color: var(--c-text); cursor: default; user-select: none; }
+.sh[data-g] { cursor: pointer; }
+.sh .chev { color: var(--c-crumb); margin-left: -2px; }
 .sh i { width: 6px; height: 6px; border-radius: 50%; }
 .sh .n { font-weight: 400; color: var(--c-crumb); }
-.item { display: grid; grid-template-columns: 16px minmax(0, 1fr) auto; gap: 7px 8px; align-items: center; padding: 9px 10px 10px; margin-bottom: 8px; border: 1px solid var(--c-border); border-radius: var(--c-radius); cursor: pointer; }
+.cntl { margin: 10px 0 0; color: var(--c-crumb); font-size: 12px; }
+/* Egy tab egy keretes sor: cím, mezők (érték fölül, kis nagybetűs címke alatta), állapotcímkék, „···” (Programa termék sora) */
+.item { position: relative; display: grid; grid-template-columns: 16px minmax(0, 1fr) auto; gap: 6px 8px; align-items: center; padding: 8px 4px 10px 10px; margin-bottom: 8px; border: 1px solid var(--c-border); border-radius: var(--c-radius); cursor: pointer; user-select: none; }
 .item .fav-none { color: var(--c-label); }
+.item .ck { color: var(--c-value); }
 .item .t { font: var(--c-title); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.item .fields { grid-column: 2 / -1; display: flex; gap: 6px 16px; flex-wrap: wrap; }
+.item.slept .t { color: var(--c-dim); font-weight: 400; }
+.item .dots { width: 26px; height: 22px; }
+.item .fields, .item .snip, .item .jobl { grid-column: 2 / -1; padding-right: 6px; }
+.fields { display: flex; gap: 6px 16px; flex-wrap: wrap; align-items: center; }
 .f { min-width: 0; }
 .f .v { font: var(--c-value-font); color: var(--c-value); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px; }
 .f .l { margin-top: 3px; font: var(--c-label-font); letter-spacing: .06em; text-transform: uppercase; color: var(--c-label); }
-.item .snip { grid-column: 2 / -1; color: var(--c-value); font: 400 12px/1.4 var(--c-font); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.item .snip { color: var(--c-value); font: 400 12px/1.4 var(--c-font); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 mark.hit { background: var(--c-hit); color: inherit; padding: 0 1px; border-radius: 2px; }
-/* Állapotcímke: üres kör + szöveg + nyíl (Programa „◯ Quoting ▾”) */
+.jobl { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+/* Állapotcímke (Programa „◯ Quoting”): kör vagy az állapot vonalas ikonja + szöveg */
 .pill { display: inline-flex; align-items: center; gap: 5px; height: 22px; padding: 0 6px; border: 1px solid var(--c-border); border-radius: var(--c-radius); font: 400 11px/1 var(--c-font); color: var(--c-value); background: var(--c-bg); white-space: nowrap; }
-.pill .o { width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--c-label); }
+.pill .li { color: var(--c-icon); }
+.pill .o { width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--c-label); flex: none; }
 .pill .o.full { background: var(--c-value); border-color: var(--c-value); }
-/* Mezők nézet: tömör táblázat */
-.tbl { width: 100%; border-collapse: collapse; }
-.tbl th { font: var(--c-label-font); letter-spacing: .06em; text-transform: uppercase; color: var(--c-label); text-align: left; padding: 6px 6px 6px 0; border-bottom: 1px solid var(--c-border); }
-.tbl td { padding: 7px 6px 7px 0; border-bottom: 1px solid var(--c-border); font: var(--c-value-font); color: var(--c-value); white-space: nowrap; }
-.tbl td.t { max-width: 0; width: 100%; overflow: hidden; text-overflow: ellipsis; color: var(--c-text); }
-.tbl td.t span { display: inline-flex; vertical-align: -3px; margin-right: 6px; }
-.tbl th.r, .tbl td.r { text-align: right; padding-right: 0; padding-left: 10px; }
-/* Felugrók */
-.pop { position: absolute; right: 8px; top: 34px; z-index: 5; width: 250px; background: var(--c-bg); border: 1px solid var(--c-border); border-radius: var(--c-radius-btn); box-shadow: var(--c-pop-shadow); padding: 10px; }
-.pop h4 { margin: 0 0 8px; font: 600 12px/1 var(--c-font); }
-.pop .r { display: flex; gap: 4px; align-items: center; }
-.pop select, .pop input[type=number] { flex: 1; min-width: 0; height: 28px; border: 1px solid var(--c-border); border-radius: var(--c-radius); font: 400 12px var(--c-font); color: var(--c-value); background: var(--c-bg); padding: 0 6px; }
-.pop .dirb { width: 28px; height: 28px; display: grid; place-items: center; border: 0; border-radius: var(--c-radius); background: none; color: var(--c-icon); cursor: pointer; }
-.pop .dirb.on { background: var(--c-btn2); color: var(--c-text); }
-.pop label { display: flex; align-items: center; gap: 6px; margin-top: 9px; font: 400 12px/1 var(--c-font); color: var(--c-value); }
-.btn2 { border: 0; background: var(--c-btn2); color: var(--c-value); font: 400 12px/1 var(--c-font); padding: 7px 10px; border-radius: var(--c-radius-btn); cursor: pointer; white-space: nowrap; }
-.btn1 { border: 0; background: var(--c-primary); color: #fff; font: 600 12px/1 var(--c-font); padding: 8px 12px; border-radius: var(--c-radius-btn); cursor: pointer; white-space: nowrap; }
-.apply { flex: none; display: flex; align-items: center; gap: 8px; padding: 8px 10px 8px 14px; border-top: 1px solid var(--c-border); }
-.apply .tx { flex: 1; min-width: 0; color: var(--c-crumb); font-size: 12px; }
-/* Alsó eszközsor: szöveges ikongombok (a Programa oldalsáv eszközeinek színe) */
+.ring { width: 11px; height: 11px; border-radius: 50%; border: 1px solid var(--c-value); flex: none; }
+.dens-kompakt .item { padding: 4px 4px 5px 10px; margin-bottom: 4px; gap: 3px 8px; }
+.dens-kompakt .f .l { display: none; }
+.dens-kompakt .fields { gap: 3px 12px; }
+.dens-kompakt .pill { height: 18px; }
+.btn2 { border: 0; background: var(--c-btn2); color: var(--c-value); font: 400 12px/1 var(--c-font); padding: 6px 9px; border-radius: var(--c-radius-btn); cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 5px; }
+.btn2:disabled { color: var(--c-label); cursor: default; }
+.btn1 { border: 0; background: var(--c-primary); color: #fff; font: 600 12px/1 var(--c-font); padding: 8px 12px; border-radius: var(--c-radius-btn); cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; }
+.empty { padding: 12px 0 4px; }
+.empty .h { font: var(--c-title); margin-bottom: 4px; }
+.empty p, .hint { margin: 0 0 10px; color: var(--c-crumb); font-size: 12px; }
+.hint { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+/* Kijelölés: a lap egyetlen fő gombja a Rendezés (Programa „Share” szerepében) */
+.selb, .note { flex: none; display: flex; align-items: center; gap: 8px; padding: 8px 10px 8px 14px; border-top: 1px solid var(--c-border); }
+.selb .tx, .note .tx { flex: 1; min-width: 0; color: var(--c-crumb); font-size: 12px; }
+.selb .tx b { color: var(--c-text); }
+/* Alsó eszközsor: a modulindítók szöveges ikongombként (a Programa oldalsáv eszközeinek színe) */
 .foot { flex: none; display: flex; align-items: center; gap: 2px; height: 40px; padding: 0 6px 0 8px; background: var(--c-tools); border-top: 1px solid var(--c-border); }
 .foot .mods { display: flex; gap: 2px; min-width: 0; overflow-x: auto; scrollbar-width: none; }
-.foot .sp { flex: 1; }
-.foot .tb.busy .lb::after { content: attr(data-p); margin-left: 4px; color: var(--c-text); font-weight: 600; }
-.empty { border: 1px solid var(--c-border); border-radius: var(--c-radius); padding: 12px; margin-top: 4px; }
-.empty .h { font: var(--c-title); margin-bottom: 4px; }
-.empty p { margin: 0 0 10px; color: var(--c-crumb); font-size: 12px; }
-.empty .acts { display: flex; gap: 6px; flex-wrap: wrap; }
-/* Összefoglaló */
+.foot .tb .pct { font-weight: 600; color: var(--c-text); }
+/* Összefoglaló és átirat: a lap formája, fejlécben a mezősor */
 .doc { flex: 1; min-height: 0; overflow: auto; padding: 0 14px 16px; }
-.doc .fields { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: flex-start; padding: 10px 0 12px; border-bottom: 1px solid var(--c-border); margin-bottom: 12px; }
 .doc h2 { margin: 2px 0 8px; font: 600 15px/1.3 var(--c-font); }
-.doc p { margin: 0 0 10px; font: 400 13px/1.6 var(--c-font); color: var(--c-value); }
-.ask { flex: none; display: flex; gap: 6px; padding: 8px 10px 8px 14px; border-top: 1px solid var(--c-border); }
+.doc .fields { padding: 4px 0 12px; border-bottom: 1px solid var(--c-border); margin-bottom: 12px; gap: 8px 14px; }
+.doc ul { margin: 0 0 12px; padding-left: 18px; }
+.doc li, .doc .qa p { margin: 0 0 9px; font: 400 13px/1.6 var(--c-font); color: var(--c-value); }
+.doc .qa { border-top: 1px solid var(--c-border); padding-top: 10px; }
+.doc .qa .q { font: var(--c-title); margin-bottom: 4px; }
+.doc .mut { color: var(--c-crumb); font-size: 12px; }
+.tr { width: 100%; border-collapse: collapse; }
+.tr td { padding: 7px 8px 7px 0; border-bottom: 1px solid var(--c-border); font: 400 13px/1.45 var(--c-font); color: var(--c-value); vertical-align: top; }
+.tr tr { cursor: pointer; }
+.tr tr:hover td { background: var(--c-hover); }
+.tr td.ts { width: 44px; color: var(--c-crumb); font-variant-numeric: tabular-nums; }
+.ask { flex: none; padding: 8px 10px 10px 14px; border-top: 1px solid var(--c-border); }
+.ask .pr { display: flex; gap: 6px; margin-bottom: 8px; overflow: hidden; }
+.ask .ar { display: flex; gap: 6px; }
 .ask input { flex: 1; min-width: 0; height: 30px; border: 1px solid var(--c-border); border-radius: var(--c-radius); padding: 0 8px; font: 400 13px var(--c-font); color: var(--c-text); outline: 0; }
-/* HUD a videón: mezősáv, érték fölül, kis nagybetűs címke alatta */
+/* Felugró menü: a Programa „Sort by” felugró formája; jelölőnégyzet a „Sort within sections” mintájára */
+.menu { position: absolute; z-index: 10; min-width: 210px; max-width: 270px; overflow: auto; background: var(--c-bg); border: 1px solid var(--c-border); border-radius: var(--c-radius-btn); box-shadow: var(--c-pop-shadow); padding: 6px 0; }
+.menu .mh { padding: 10px 12px 6px; font: 600 12px/1.2 var(--c-font); color: var(--c-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.menu .mh:first-child { padding-top: 6px; }
+.menu .mi { width: 100%; display: flex; align-items: center; gap: 8px; height: 28px; padding: 0 12px; border: 0; background: none; font: 400 12px/1 var(--c-font); color: var(--c-value); text-align: left; cursor: pointer; white-space: nowrap; }
+.menu .mi:hover { background: var(--c-hover); }
+.menu .mi:disabled { color: var(--c-label); cursor: default; background: none; }
+.menu .mi .ck { width: 14px; display: grid; flex: none; color: var(--c-icon); }
+.menu .mi.on .ck { color: var(--c-value); }
+.menu .mi i { width: 6px; height: 6px; border-radius: 50%; flex: none; }
+.menu .mi .n { margin-left: auto; color: var(--c-crumb); }
+.menu .ms { height: 1px; background: var(--c-border); margin: 6px 0; }
+.menu .mnote { padding: 6px 12px 4px; color: var(--c-crumb); font-size: 11px; white-space: normal; }
+.menu .mp { display: flex; align-items: center; gap: 6px; padding: 2px 12px 6px 34px; font: 400 12px/1 var(--c-font); color: var(--c-value); }
+.menu .mp input { width: 100px; height: 28px; border: 1px solid var(--c-border); border-radius: var(--c-radius); font: 400 12px var(--c-font); color: var(--c-value); background: var(--c-bg); padding: 0 6px; outline: 0; }
+/* HUD a videón: mezősáv, érték fölül, kis nagybetűs címke alatta; felirat közben az állapotcímke fölötte */
 .hudc { position: absolute; left: 14px; top: 14px; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
-.hud-f { display: flex; gap: 16px; background: #ffffff; border: 1px solid var(--c-border); border-radius: var(--c-radius); padding: 7px 10px 6px; }
+.hud-f { display: flex; gap: 16px; background: var(--c-bg); border: 1px solid var(--c-border); border-radius: var(--c-radius); padding: 7px 10px 6px; }
 .hud-f .v { font: 600 14px/1.2 var(--c-font); color: var(--c-text); }
 .hud-f .l { margin-top: 3px; font: var(--c-label-font); letter-spacing: .06em; text-transform: uppercase; color: var(--c-label); }
 .hud-job .pill { height: 26px; font-size: 12px; padding: 0 4px 0 8px; gap: 6px; }
 .hud-job .pill button { border: 0; background: var(--c-btn2); color: var(--c-value); font: 400 11px/1 var(--c-font); padding: 4px 6px; border-radius: var(--c-radius); cursor: pointer; }
-.ring { width: 11px; height: 11px; border-radius: 50%; border: 1px solid var(--c-value); }
 </style>
 </head>
 <body>
 <script src="../ikonok.js"></script>
 <script src="../vonalas-ikonok.js"></script>
 <script src="../adat.js"></script>
+<script src="../mukodes.js"></script>
 <script src="../keret.js"></script>
 <script>
 (function () {
-  const S = { view: 'lista', mode: 'lista', q: '', searching: false, allWin: false, pop: null, sort: null, filter: null, job: null, applied: false };
-  let host;
-  const esc = SV.esc;
-  const KEYS = { ar: 'Ár', cim: 'Cím', webhely: 'Webhely', utoljara: 'Utolsó használat' };
-
-  function ring(p) { return `<span class="ring" style="background:conic-gradient(var(--c-value) ${p}%, transparent 0)"></span>`; }
-  function pill(t) {
-    if (S.job && t.id === 8) return `<span class="pill">${ring(S.job.pct)}Felirat ${S.job.pct}% ${lineIcon('chevron-down', 11)}</span>`;
-    const s = t.active ? 'Aktív' : t.audible ? 'Hangot ad' : t.discarded ? 'Altatva' : t.pinned ? 'Rögzítve' : '';
-    return s ? `<span class="pill"><span class="o ${t.active ? 'full' : ''}"></span>${s} ${lineIcon('chevron-down', 11)}</span>` : '';
+  const esc = SV.esc, st = M.st;
+  const field = (v, l) => `<div class="f"><div class="v">${v}</div><div class="l">${l}</div></div>`;
+  const ring = (p) => `<span class="ring" style="background:conic-gradient(var(--c-value) ${p}%, transparent 0)"></span>`;
+  function groupLabel() {
+    if (st.group === 'mind') return { title: 'Minden csoport', color: null };
+    if (st.group === 'nincs') return { title: 'Csoport nélkül', color: null };
+    const g = SV.groups[st.group];
+    return { title: g ? g.title : st.group, color: g ? SV.groupColor[g.color] : null };
   }
-  function field(v, l) { return `<div class="f"><div class="v">${v}</div><div class="l">${l}</div></div>`; }
-  function item(t, r) {
-    const fs = [field(esc(SV.domain(t.url)), 'Webhely')];
-    if (t.fields && t.fields.ar) fs.push(field(SV.huf(t.fields.ar), 'Ár'));
-    fs.push(field(t.active ? 'most' : SV.ago(t.last), 'Utoljára'));
-    if (r && t.win !== 1) fs.push(field(`${t.win}. ablak`, 'Ablak'));
-    const title = r && r.inTitle ? SV.mark(t.title, S.q, 'hit') : esc(t.title);
-    const snip = r && r.inText && !r.inTitle ? `<div class="snip">${SV.mark(SV.snippet(t.text, S.q, 40), S.q, 'hit')}</div>` : '';
-    return `<div class="item" data-tab="${t.id}">${SV.favicon(t, 16)}<div class="t" title="${esc(t.title)}">${title}</div>${pill(t)}${snip}<div class="fields">${fs.join('')}</div></div>`;
+  function crumbs() {
+    const g = groupLabel();
+    return `<div class="bc"><button class="cr" data-menu="ablak">${st.win === 'mind' ? 'Minden ablak' : 'Ez az ablak'}${lineIcon('chevron-down', 12)}</button><span>/</span>
+      <button class="cr cur" data-menu="csoport">${g.color ? `<i style="background:${g.color}"></i>` : ''}${esc(g.title)}${lineIcon('chevron-down', 12)}</button><span class="sp"></span>
+      <button class="ib" data-menu="tobb" title="Sűrűség, beállítások">${lineIcon('ellipsis', 16)}</button></div>`;
   }
-  function value(t, k) { return k === 'ar' ? (t.fields && t.fields.ar) : k === 'cim' ? t.title : k === 'webhely' ? SV.domain(t.url) : t.last; }
-  function sorted(list) {
-    if (!S.sort) return list;
-    const k = S.sort.key, d = S.sort.dir;
-    return list.slice().sort((a, b) => {
-      const va = value(a, k), vb = value(b, k);
-      if (va == null && vb == null) return 0; if (va == null) return 1; if (vb == null) return -1;
-      return (typeof va === 'string' ? va.localeCompare(vb, 'hu') : va - vb) * d;
-    });
-  }
-  function filtered(list) { return S.filter ? list.filter((t) => t.fields && t.fields.ar != null && t.fields.ar <= S.filter.max) : list; }
-  function sections() {
-    const tabs = SV.tabs.filter((t) => S.allWin || t.win === 1);
-    const out = []; let cur = null;
-    for (const t of tabs) {
-      const key = `${t.win}:${t.group || (t.pinned ? 'pin' : 'none')}`;
-      if (!cur || cur.key !== key) { cur = { key, win: t.win, group: t.group, pinned: t.pinned, tabs: [] }; out.push(cur); }
-      cur.tabs.push(t);
-    }
-    // Csoport nélküli tabok egy szakaszba (rögzített külön)
-    const merged = []; const none = {};
-    for (const s of out) { if (!s.group && !s.pinned) { const k = 'none' + s.win; if (!none[k]) { none[k] = { ...s, key: k, tabs: [] }; merged.push(none[k]); } none[k].tabs.push(...s.tabs); } else merged.push(s); }
-    return merged;
-  }
-  function sh(s, n) {
-    const g = s.group && SV.groups[s.group];
-    const name = g ? g.title : s.pinned ? 'Rögzítve' : 'Csoport nélkül';
-    return `<div class="sh">${g ? `<i style="background:${SV.groupColor[g.color]}"></i>` : ''}${esc(name)}${S.allWin ? ` <span class="n">· ${s.win}. ablak</span>` : ''} <span class="n">${n}</span></div>`;
-  }
-  function listBody() {
-    if (S.searching && S.q) return searchBody();
-    const secs = sections();
-    let html = '';
-    if (S.sort && !S.sort.within) {
-      const all = filtered(sorted(secs.flatMap((s) => s.tabs)));
-      if (!all.length) return emptyFilter();
-      return `<div class="sh">Rendezve: ${KEYS[S.sort.key].toLowerCase()} szerint <span class="n">${all.length}</span></div>` + all.map((t) => S.mode === 'mezok' ? '' : item(t)).join('') + (S.mode === 'mezok' ? table(all) : '');
-    }
-    let n = 0;
-    for (const s of secs) {
-      const tabs = filtered(S.sort ? sorted(s.tabs) : s.tabs);
-      if (!tabs.length) continue; n += tabs.length;
-      html += sh(s, tabs.length) + (S.mode === 'mezok' ? table(tabs) : tabs.map((t) => item(t)).join(''));
-    }
-    return n ? html : emptyFilter();
-  }
-  function table(tabs) {
-    const hasAr = tabs.some((t) => t.fields && t.fields.ar);
-    return `<table class="tbl"><thead><tr><th>Cím</th>${hasAr ? '<th class="r">Ár</th>' : ''}<th class="r">Utoljára</th></tr></thead><tbody>${tabs.map((t) => `<tr data-tab="${t.id}"><td class="t"><span>${SV.favicon(t, 14)}</span>${esc(t.title)}</td>${hasAr ? `<td class="r">${t.fields && t.fields.ar ? SV.huf(t.fields.ar) : '–'}</td>` : ''}<td class="r">${t.active ? 'most' : SV.ago(t.last)}</td></tr>`).join('')}</tbody></table>`;
-  }
-  function emptyFilter() {
-    const priced = SV.tabs.filter((t) => t.fields && t.fields.ar).sort((a, b) => a.fields.ar - b.fields.ar);
-    return `<div class="empty"><div class="h">Nincs tab, amelynek ára ≤ ${SV.huf(S.filter.max)}</div><p>${priced.length} tabon van ár mező. A legolcsóbb: ${esc(priced[0].title.split(' – ')[0])}, ${SV.huf(priced[0].fields.ar)}.</p><div class="acts"><button class="btn2" data-unfilter>Szűrő törlése</button><button class="btn2" data-filter-to="${priced[0].fields.ar}">Ár ≤ ${SV.huf(priced[0].fields.ar)}</button></div></div>`;
-  }
-  // Kereséskor a találatok az ok szerint csoportosítva (Coda: Pages / Text)
-  function searchBody() {
-    const res = SV.search(S.q, SV.tabs);
-    if (!res.length) {
-      const words = S.q.split(/\s+/).filter((w) => w.length > 2);
-      const near = []; for (const w of words) for (const r of SV.search(w, SV.tabs)) if (!near.some((x) => x.tab === r.tab)) near.push(r);
-      const keep = S.q; let nearHTML = '';
-      if (near.length) { S.q = words[0]; nearHTML = `<div class="sh">Részben egyezik: „${esc(words[0])}” <span class="n">${near.length}</span></div>` + near.map((r) => item(r.tab, r)).join(''); S.q = keep; }
-      return `<div class="empty"><div class="h">Nincs ilyen nyitott tab: „${esc(S.q)}”</div><p>${SV.tabs.length} tab címében és URL-jében, és ${SV.extracted} tab szövegében kerestem, minden ablakban.</p><div class="acts"><button class="btn2" data-web>Keresés a weben</button><button class="btn2" data-clear>Keresés törlése</button></div></div>` + nearHTML;
-    }
-    const byTitle = res.filter((r) => r.inTitle || r.inUrl && !r.inText), byText = res.filter((r) => !r.inTitle && r.inText);
-    let h = '';
-    if (byTitle.length) h += `<div class="sh">Cím <span class="n">${byTitle.length}</span></div>` + byTitle.map((r) => item(r.tab, r)).join('');
-    if (byText.length) h += `<div class="sh">Szöveg <span class="n">${byText.length}</span></div>` + byText.map((r) => item(r.tab, r)).join('');
-    return h;
-  }
-  function crumbs(extra) {
-    return `<div class="bc">Ablakok <span>/</span> <button class="cur" data-win>${S.allWin ? 'Minden ablak' : '1. ablak'} ${lineIcon('chevron-down', 12)}</button>${extra || ''}<span class="sp"></span><button class="ib" title="Munkamenetek, csoportszabályok, beállítások">${lineIcon('ellipsis', 16)}</button></div>`;
+  function viewCrumbs(title) {
+    return `<div class="bc"><button class="cr" data-op="back" title="Vissza a tabokhoz (Esc)">${lineIcon('arrow-left', 14)}Tabok</button><span>/</span><span class="cur">${title}</span><span class="sp"></span><span class="kbd">Esc</span>
+      <button class="ib" data-menu="tobb" title="Sűrűség, beállítások">${lineIcon('ellipsis', 16)}</button></div>`;
   }
   function toolsHTML() {
-    if (S.searching) return `<div class="tools"><div class="sbox">${lineIcon('search', 14)}<input value="${esc(S.q)}" placeholder="Keresés: cím, URL, szöveg" aria-label="Keresés"></div><button class="tb" data-clear>Mégse</button></div>`;
-    return `<div class="tools"><div class="seg"><button class="${S.mode === 'lista' ? 'on' : ''}" data-mode="lista">Lista</button><button class="${S.mode === 'mezok' ? 'on' : ''}" data-mode="mezok">Mezők</button></div><span class="sp"></span>
-      <button class="tb" data-search title="Keresés (/)">${lineIcon('search', 14)}<span class="lb">Keresés</span></button>
-      <button class="tb ${S.filter ? 'on' : ''}" data-pop="szuro" title="Szűrő">${lineIcon('list-filter', 14)}<span class="lb">Szűrő</span></button>
-      <button class="tb ${S.sort ? 'on' : ''}" data-pop="rendez" title="Rendezés">${lineIcon('arrow-up-down', 14)}<span class="lb">Rendezés</span></button>
-      ${S.pop === 'rendez' ? sortPop() : S.pop === 'szuro' ? filterPop() : ''}</div>`;
+    const nf = M.activeFilters().length;
+    const left = M.ui.searchOpen || st.q
+      ? `<div class="sbox">${lineIcon('search', 14)}<input data-q value="${esc(st.q)}" placeholder="Keresés: cím, URL, szöveg" aria-label="Keresés"><button class="ib sm" data-op="closeSearch" title="Bezárás (Esc)">${lineIcon('x', 14)}</button></div>`
+      : `<span class="cnt">${M.sections().reduce((n, s) => n + s.shown, 0)} tab</span><span class="sp"></span><button class="tb" data-op="search" title="Keresés (/)">${lineIcon('search', 14)}<span class="lb">Keresés</span></button>`;
+    return `<div class="tools">${left}<button class="tb ${nf ? 'on' : ''}" data-menu="szuro" title="Szűrő">${lineIcon('list-filter', 14)}<span class="lb">Szűrő</span>${nf ? `<span class="nf">${nf}</span>` : ''}</button><button class="tb" data-menu="rendezes" title="Rendezés">${lineIcon('arrow-up-down', 14)}<span class="lb">Rendezés</span></button></div>`;
   }
-  function sortPop() {
-    const s = S.sort || { key: 'ar', dir: 1, within: true };
-    return `<div class="pop" data-popbox><h4>Rendezés</h4><div class="r"><select data-sortkey>${Object.entries(KEYS).map(([k, l]) => `<option value="${k}" ${s.key === k ? 'selected' : ''}>${l}</option>`).join('')}</select>
-      <button class="dirb ${s.dir === 1 ? 'on' : ''}" data-dir="1" title="Növekvő">${lineIcon('arrow-up', 14)}</button><button class="dirb ${s.dir === -1 ? 'on' : ''}" data-dir="-1" title="Csökkenő">${lineIcon('arrow-down', 14)}</button><button class="dirb" data-unsort title="Rendezés törlése">${lineIcon('x', 14)}</button></div>
-      <label><input type="checkbox" data-within ${s.within ? 'checked' : ''}> Csoporton belül</label></div>`;
-  }
-  function filterPop() {
-    return `<div class="pop" data-popbox><h4>Szűrő</h4><div class="r"><select><option>Ár</option></select><select style="flex:0 0 46px"><option>≤</option></select><input type="number" data-max value="${S.filter ? S.filter.max : 20000}" step="1000"></div>
-      <label><input type="checkbox" checked disabled> Csak ahol van ár mező</label><div class="r" style="margin-top:10px;justify-content:flex-end;gap:6px"><button class="btn2" data-unfilter>Törlés</button><button class="btn2" data-dofilter>Szűrés</button></div></div>`;
-  }
+  // A bekapcsolt szűrők; a csoport a morzsamenüben látszik, ezért itt nem ismétlem.
   function chipsHTML() {
-    const c = [];
-    if (S.sort) c.push(`<span class="chip">${KEYS[S.sort.key]} ${S.sort.dir === 1 ? '↑' : '↓'}${S.sort.within ? ' · csoporton belül' : ''}<button data-unsort title="Törlés">${lineIcon('x', 12)}</button></span>`);
-    if (S.filter) c.push(`<span class="chip">Ár ≤ ${SV.huf(S.filter.max)}<button data-unfilter title="Törlés">${lineIcon('x', 12)}</button></span>`);
-    return c.length && !S.searching ? `<div class="chips">${c.join('')}</div>` : '';
+    const f = M.activeFilters().filter((x) => x.op !== 'group');
+    if (!f.length) return '';
+    return `<div class="chips">${f.map((x) => `<span class="chip">${esc(x.label)}<button data-op="${x.op}" data-arg="${x.arg == null ? '' : x.arg}" title="Kikapcsolás">${lineIcon('x', 12)}</button></span>`).join('')}<button class="tb" data-op="clearFilters">Szűrők törlése</button></div>`;
   }
-  function applyHTML() {
-    if (!S.sort || S.searching) return '';
-    if (S.applied) return `<div class="apply"><span class="tx">A böngészőben is ${KEYS[S.sort.key].toLowerCase()} szerint áll${S.sort.within ? ', csoporton belül' : ''}.</span><button class="btn2" data-unapply>Visszavonás</button></div>`;
-    return `<div class="apply"><span class="tx">Csak itt rendezve.</span><button class="btn1" data-apply>Sorrend a böngészőben is</button></div>`;
+  function jobLine(t) {
+    const j = M.job();
+    if (!j || t.id !== M.VIDEO_TAB) return '';
+    const fut = j.state === 'fut';
+    return `<div class="jobl"><span class="pill">${fut ? ring(j.pct) : `<span class="o ${j.state === 'kesz' ? 'full' : ''}"></span>`}${M.jobText()}</span><button class="btn2" data-op="jobOpen">Átirat</button>${fut ? '<button class="btn2" data-op="jobCancel">Megszakítás</button>' : ''}</div>`;
   }
+  function item(t, r, q) {
+    const sel = st.sel.has(t.id);
+    const title = r && r.inTitle ? SV.mark(t.title, q, 'hit') : esc(t.title);
+    const fs = [field(esc(SV.domain(t.url)), 'Webhely')];
+    const p = M.price(t);
+    if (p) fs.push(field(p, 'Ár'));
+    fs.push(field(t.active ? 'most' : SV.ago(t.last), 'Utoljára'));
+    if (r && t.win !== M.CUR) fs.push(field(`${t.win}. ablak`, 'Ablak'));
+    const pills = (t.active ? ['<span class="pill"><span class="o full"></span>Aktív</span>'] : [])
+      .concat(M.states(t).map((s) => `<span class="pill">${lineIcon(s.icon, 12)}${s.label}</span>`));
+    let snip = '';
+    if (r && r.why === 'szoveg') snip = `<div class="snip">${SV.mark(SV.snippet(t.text, q, 40), q, 'hit')}</div>`;
+    else if (r && r.why === 'url') snip = `<div class="snip">${SV.mark(SV.snippet(t.url, q, 30), q, 'hit')}</div>`;
+    return `<div class="item ${t.discarded ? 'slept' : ''}" data-tab="${t.id}"${sel ? ' aria-selected="true"' : ''}>${sel ? lineIcon('square-check', 16, 'ck') : SV.favicon(t, 16)}<div class="t" title="${esc(t.title)}">${title}</div><button class="ib dots" data-rowmenu="${t.id}" title="Műveletek (vagy jobb klikk)">${lineIcon('ellipsis', 16)}</button>${snip}<div class="fields">${fs.join('')}${pills.join('')}</div>${jobLine(t)}</div>`;
+  }
+  function emptyHTML(e, extra) { return `<div class="empty"><div class="h">${e.title}</div><p>${esc(e.text)}</p><button class="btn2" data-op="${e.action.op}">${e.action.label}</button></div>${extra || ''}`; }
+  function listHTML() {
+    const secs = M.sections();
+    if (!secs.some((s) => s.shown)) return emptyHTML(M.emptyList());
+    let h = '';
+    for (const s of secs) {
+      if (st.win === 'mind') h += `<div class="wl">${s.title} <span class="n">${s.total}</span></div>`;
+      for (const g of s.groups) {
+        h += `<div class="sh" data-g="${g.id}" data-op="collapse" data-arg="${g.id}" title="${g.collapsed ? 'Kinyitás' : 'Összecsukás'}">${lineIcon(g.collapsed ? 'chevron-right' : 'chevron-down', 14, 'chev')}${g.color ? `<i style="background:${g.color}"></i>` : ''}${esc(g.title)} <span class="n">${g.tabs.length}</span></div>`;
+        if (!g.collapsed) h += g.tabs.map((t) => item(t)).join('');
+      }
+    }
+    return h;
+  }
+  // Kereséskor a találatok az ok szerint csoportosítva (Coda: Pages / Text).
+  function resultsHTML(r) {
+    const hint = M.otherHint(r);
+    const hintH = hint ? `<p class="hint">${hint.text}<button class="btn2" data-op="${hint.op}" data-arg="${hint.arg}">${hint.label}</button></p>` : '';
+    if (!r.list.length) return emptyHTML(M.empty(r), hintH);
+    let h = `<p class="cntl">${M.countLine(r)}</p>`;
+    for (const [k, l] of [['cim', 'Cím'], ['szoveg', 'Szöveg'], ['url', 'URL']]) {
+      const xs = r.list.filter((x) => x.why === k);
+      if (xs.length) h += `<div class="sh">${l} <span class="n">${xs.length}</span></div>` + xs.map((x) => item(x.tab, x, r.q)).join('');
+    }
+    return h + hintH;
+  }
+  function selHTML() {
+    if (!st.sel.size) return '';
+    return `<div class="selb"><span class="tx"><b>${st.sel.size}</b> kijelölve</span><button class="btn2" data-op="selClear">Mégse</button><button class="btn1" data-menu="rendezes">${lineIcon('arrow-up-down', 13)}Rendezés</button></div>`;
+  }
+  function noteHTML() { return st.note ? `<div class="note" role="status"><span class="tx">${esc(st.note.text)}</span><button class="ib sm" data-op="dismiss" title="Bezárás">${lineIcon('x', 14)}</button></div>` : ''; }
   function footHTML() {
-    return `<div class="foot"><div class="mods">${SV.moduleOrder('c').map((m) => `<button class="tb ${m.id === 'felirat' && S.job ? 'busy' : ''}" data-id="${m.id}" title="${esc(m.name)}${m.key ? ' · ' + m.key : ''}\nHúzd a sorrendhez">${lineIcon(m.icon, 14)}<span class="lb" ${m.id === 'felirat' && S.job ? `data-p="${S.job.pct}%"` : ''}>${m.short}</span></button>`).join('')}</div></div>`;
+    const j = M.job(), busy = j && j.state === 'fut';
+    return `<div class="foot"><div class="mods" data-launchers>${SV.moduleOrder('c').map((m) => `<button class="tb" data-launch data-id="${m.id}" title="${esc(m.name)}${m.key ? ' · ' + m.key : ''}${busy && m.id === 'felirat' ? ' · ' + M.jobText() : ''}\nHúzd a sorrendhez">${lineIcon(m.icon, 14)}<span class="lb">${m.short}</span>${busy && m.id === 'felirat' ? `<span class="pct">${j.pct}%</span>` : ''}</button>`).join('')}</div></div>`;
   }
-  function docHTML() {
-    const s = SV.summary;
-    return crumbs(` <span>/</span> <span>Siteview</span> <span>/</span> <span style="color:var(--c-text);font-weight:600">Összefoglaló</span>`) + `<div class="doc"><h2>${esc(s.source)}</h2>
-      <div class="fields">${field('Teljes oldal', 'Forrás')}${field(esc(s.domain), 'Oldal')}${field('Claude', 'Modell')}<div class="f"><div class="v"><span class="pill"><span class="ring" style="background:conic-gradient(var(--c-value) 70%, transparent 0)"></span>Készül</span></div></div><span style="flex:1"></span><button class="btn2" data-stop-sum>Leállítás</button></div>
-      ${s.paragraphs.map((p) => `<p>${esc(p)}</p>`).join('')}</div>
-      <div class="ask"><input placeholder="Kérdés az oldalról"><button class="btn1">Kérdezz</button></div>`;
+  function summaryHTML() {
+    const s = M.sum, fut = s.state === 'fut';
+    return viewCrumbs('Összefoglaló') + `<div class="doc" data-list><h2>${esc(s.source)}</h2>
+      <div class="fields">${field(s.kind, 'Forrás')}${field(esc(s.domain), 'Oldal')}${field(esc(s.prompt), 'Prompt')}<span class="pill"><span class="o ${s.state === 'kesz' ? 'full' : ''}"></span>${M.sumStateText()}</span>${fut ? '<button class="btn2" data-op="sumStop">Leállítás</button>' : ''}</div>
+      <ul>${M.sumItems().map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
+      ${s.state === 'leallitva' ? '<p class="mut">Leállítva. Az eddigi szöveg megmaradt.</p>' : ''}
+      ${s.qa.map((x) => `<div class="qa"><div class="q">${esc(x.q)}</div><p>${esc(x.a)}</p></div>`).join('')}</div>
+      <div class="ask"><div class="pr">${SV.prompts.map((p, i) => `<button class="btn2" data-op="prompt" data-arg="${i}">${esc(p)}</button>`).join('')}</div>
+        <div class="ar"><input data-ask placeholder="Kérdezz az oldalról" value="${esc(M.ui.askDraft || '')}"><button class="btn1" data-op="ask">Küldés</button></div></div>`;
+  }
+  function transcriptHTML() {
+    const j = M.job(), v = M.tab(M.VIDEO_TAB), fut = j && j.state === 'fut';
+    return viewCrumbs('Átirat') + `<div class="doc" data-list><h2>${esc(v.title)}</h2>
+      <div class="fields">${field(esc(SV.domain(v.url)), 'Oldal')}<span class="pill">${fut ? ring(j.pct) : `<span class="o ${j && j.state === 'kesz' ? 'full' : ''}"></span>`}${j ? M.jobText() : 'Még nincs felirat'}</span>
+        ${M.transcriptActions().map((a) => `<button class="btn2" data-op="${a.op}" data-arg="${a.arg || ''}"${a.disabled ? ' disabled' : ''}${a.title ? ` title="${a.title}"` : ''}>${a.op === 'export' ? 'Mentés ' : ''}${a.label}</button>`).join('')}</div>
+      <table class="tr"><tbody>${M.segments().map(([t, x]) => `<tr data-op="seek" data-arg="${t}" title="Ugrás ide"><td class="ts">${Keret.fmt(t)}</td><td>${esc(x)}</td></tr>`).join('')}</tbody></table>
+      ${fut ? '<p class="mut">A többi rész átírás közben érkezik ide.</p>' : ''}</div>`;
   }
   function draw() {
-    let html;
-    if (S.view === 'osszefoglalo') html = docHTML() + footHTML();
-    else html = crumbs() + toolsHTML() + chipsHTML() + `<div class="list">${listBody()}</div>` + applyHTML() + footHTML();
-    host.innerHTML = `<div class="c">${html}</div>`;
-    const m = host.querySelector('.foot .mods'); m && SV.sortable(m, 'c');
-    const inp = host.querySelector('.sbox input');
-    if (inp) {
-      inp.addEventListener('input', () => { S.q = inp.value; const p = inp.selectionStart; draw(); const n = host.querySelector('.sbox input'); n.focus(); n.setSelectionRange(p, p); });
-      inp.addEventListener('keydown', (e) => { if (e.key === 'Escape') { S.searching = false; S.q = ''; draw(); } });
+    let inner;
+    if (st.view === 'osszefoglalo') inner = summaryHTML() + noteHTML();
+    else if (st.view === 'atirat') inner = transcriptHTML() + noteHTML();
+    else {
+      const r = M.results();
+      inner = crumbs() + toolsHTML() + chipsHTML() + `<div class="list" data-list>${r ? resultsHTML(r) : listHTML()}</div>` + noteHTML() + selHTML();
     }
-    const sk = host.querySelector('[data-sortkey]'); if (sk) sk.onchange = () => { S.sort = { ...(S.sort || { dir: 1, within: true }), key: sk.value }; S.applied = false; draw(); };
-    const w = host.querySelector('[data-within]'); if (w) w.onchange = () => { S.sort = { ...(S.sort || { key: 'ar', dir: 1 }), within: w.checked }; S.applied = false; draw(); };
+    return `<div class="c dens-${st.density}" data-root>${inner}${footHTML()}</div>`;
   }
-  function onClick(e) {
-    let closed = false;
-    if (S.pop && !e.target.closest('[data-popbox],[data-pop]')) { S.pop = null; closed = true; }
-    const el = e.target.closest('[data-mode],[data-search],[data-pop],[data-dir],[data-unsort],[data-unfilter],[data-dofilter],[data-filter-to],[data-apply],[data-unapply],[data-win],[data-clear],[data-web],[data-id],[data-stop-sum],[data-tab]');
-    if (!el) { if (closed) draw(); return; }
-    const ds = el.dataset;
-    if (ds.mode) { S.mode = ds.mode; draw(); }
-    else if ('search' in ds) { S.searching = true; S.pop = null; draw(); host.querySelector('.sbox input').focus(); }
-    else if (ds.pop) { S.pop = S.pop === ds.pop ? null : ds.pop; if (ds.pop === 'rendez' && !S.sort) S.sort = { key: 'ar', dir: 1, within: true }; S.applied = false; draw(); }
-    else if (ds.dir) { S.sort = { ...(S.sort || { key: 'ar', within: true }), dir: +ds.dir }; S.applied = false; draw(); }
-    else if ('unsort' in ds) { S.sort = null; S.pop = null; S.applied = false; draw(); }
-    else if ('unfilter' in ds) { S.filter = null; S.pop = null; draw(); }
-    else if ('dofilter' in ds) { S.filter = { max: +host.querySelector('[data-max]').value || 0 }; S.pop = null; draw(); }
-    else if (ds.filterTo) { S.filter = { max: +ds.filterTo }; draw(); }
-    else if ('apply' in ds) { S.applied = true; S.pop = null; draw(); }
-    else if ('unapply' in ds) { S.applied = false; draw(); }
-    else if ('win' in ds) { S.allWin = !S.allWin; draw(); }
-    else if ('clear' in ds) { S.searching = false; S.q = ''; draw(); }
-    else if ('web' in ds) { window.open('https://www.google.com/search?q=' + encodeURIComponent(S.q), '_blank'); }
-    else if ('stopSum' in ds) { el.outerHTML = '<span style="color:var(--c-crumb);font-size:12px">Leállítva</span>'; }
-    else if (ds.id === 'osszefoglalo') { S.view = 'osszefoglalo'; draw(); }
-    else if (ds.id === 'felirat') { location.hash = 'felirat'; }
-    else if (ds.id === 'altatas') { SV.tabs.filter((t) => t.win === 1 && !t.active && !t.pinned && !t.audible).forEach((t) => { t.discarded = true; }); draw(); }
-    else if (ds.tab) { const t = SV.tabs.find((x) => x.id === +ds.tab); Keret.openTab(t, S.q); draw(); }
+  function menuHTML(kind, items) {
+    return `<div class="menu" data-menubox role="menu">${items.map((it) => {
+      if (it.t === 'head') return `<div class="mh">${esc(it.label)}</div>`;
+      if (it.t === 'sep') return '<div class="ms"></div>';
+      if (it.t === 'note') return `<div class="mnote">${esc(it.label)}</div>`;
+      if (it.t === 'price') return `<label class="mp">${it.label}<input data-price inputmode="numeric" value="${it.value == null ? '' : it.value}" placeholder="pl. 20000">Ft</label>`;
+      let ck = '';
+      if (it.t === 'check') ck = `<span class="ck">${lineIcon(it.on ? 'square-check' : 'square', 14)}</span>`;
+      else if (it.t === 'radio') ck = `<span class="ck">${it.on ? lineIcon('check', 14) : ''}</span>`;
+      return `<button class="mi ${it.on ? 'on' : ''}" role="${it.t === 'act' ? 'menuitem' : it.t === 'radio' ? 'menuitemradio' : 'menuitemcheckbox'}"${it.t !== 'act' ? ` aria-checked="${!!it.on}"` : ''} data-op="${it.op}" data-arg="${it.arg == null ? '' : it.arg}" ${it.disabled ? 'disabled' : ''}>${ck}${it.color ? `<i style="background:${it.color}"></i>` : ''}${esc(it.label)}${it.n != null ? `<span class="n">${it.n}</span>` : ''}</button>`;
+    }).join('')}</div>`;
   }
-  document.addEventListener('keydown', (e) => {
-    if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && host) { e.preventDefault(); S.searching = true; draw(); host.querySelector('.sbox input').focus(); }
-    if (e.key === 'Escape' && S.view === 'osszefoglalo') { S.view = 'lista'; draw(); }
-  });
+  function hudHTML(m) {
+    const x = M.hudText(m);
+    let h = '';
+    if (x.job) h += `<div class="hud-job"><span class="pill">${ring(m.job.pct)}${x.job}<button data-op="${x.jobAction.op}">${x.jobAction.label}</button></span></div>`;
+    else if (x.offer) h += `<div class="hud-job"><span class="pill"><span class="o"></span>${x.offer}<button data-op="${x.offerAction.op}">${x.offerAction.label}</button></span></div>`;
+    if (m.ev === 'bal') h += `<div class="hud-f">${field(x.vol, x.volLabel)}</div>`;
+    else if (m.ev === 'jobb') h += `<div class="hud-f">${field(`${x.time} / ${x.dur}`, x.step)}${field(x.speed, x.speedLabel)}</div>`;
+    else if (m.ev === 'kozep') h += `<div class="hud-f">${field(x.play, 'Állapot')}</div>`;
+    return h ? `<div class="hudc">${h}</div>` : '';
+  }
 
-  const C = {
-    title: 'C · Összehasonlító lap',
-    render(st, el, ctx) {
-      host = el;
-      S.view = st === 'osszefoglalo' ? 'osszefoglalo' : 'lista';
-      S.q = ctx.query || ''; S.searching = !!S.q; S.pop = null;
-      S.job = st === 'felirat' ? { pct: SV.subtitle.pct } : null;
-      draw();
-      if (!host.dataset.bound) { host.addEventListener('click', onClick); host.dataset.bound = 1; }
-    },
-    badge() { return { text: S.job ? S.job.pct + '' : '', bg: '#161616', fg: '#ffffff' }; },
-    hud(c, mode, ev) {
-      const v = c.video, sp = String(v.speed).replace('.', ',');
-      let h = '';
-      if (mode === 'felirat' && S.job) h += `<div class="hud-job"><span class="pill">${ring(S.job.pct)}Felirat · átírás ${S.job.pct}%<button data-stopv>Megszakítás</button></span></div>`;
-      if (ev && ev.side === 'bal') h += `<div class="hud-f">${field(v.vol + '%', 'Hangerő')}</div>`;
-      else if (ev && ev.side === 'jobb') h += `<div class="hud-f">${field(c.fmt(v.t) + ' / ' + c.fmt(v.dur), (ev.step > 0 ? '+5' : '−5') + ' mp')}${field(sp + '×', 'Sebesség')}</div>`;
-      else if (ev && ev.side === 'sebesseg') h += `<div class="hud-f">${field(sp + '×', 'Sebesség')}</div>`;
-      else if (ev && ev.side === 'kozep') h += `<div class="hud-f">${field(v.playing ? 'Lejátszás' : 'Szünet', 'Állapot')}</div>`;
-      c.hud.innerHTML = h ? `<div class="hudc">${h}</div>` : '';
-      const b = c.hud.querySelector('[data-stopv]'); if (b) b.onclick = () => { S.job = null; Keret.setBadge(null); c.hud.innerHTML = ''; const s = c.el.querySelector('[data-sv="sub"]'); s && s.remove(); draw(); };
-    },
-  };
-  // Teszteléshez: rendezés felugró nyitva, ár szerint, csoporton belül
-  window.__extra = function (x) { if (x === 'rendez') { S.sort = { key: 'ar', dir: 1, within: true }; S.pop = 'rendez'; draw(); const sh = [...host.querySelectorAll('.sh')].find((n) => n.textContent.includes('Porszívó')); if (sh) { const l = host.querySelector('.list'); l.scrollTop += sh.getBoundingClientRect().top - l.getBoundingClientRect().top - 8; } } if (x === 'szuro') { S.filter = { max: 20000 }; draw(); } };
-  Keret.init(C);
+  Keret.init({ key: 'c', title: 'C · Összehasonlító lap', badge: { bg: '#2b2b2b', fg: '#ffffff' }, draw, menuHTML, hudHTML });
 })();
 </script>
 </body>

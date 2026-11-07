@@ -13,11 +13,11 @@ window.SV = (function () {
     pink: '#d01884', purple: '#9334e6', cyan: '#007b83', orange: '#fa903e',
   };
 
-  // last: hány perce volt aktív. unread: háttérben nyílt, még nem volt aktív (ATD9).
+  // last: hány perce volt aktív. noSleep: „ezt a tabot ne altasd” (ATD5).
   const tabs = [
     { id: 1, win: 1, pinned: true, group: null, icon: 'googlesheets', title: 'Kiadások 2026 – Google Táblázatok', url: 'https://docs.google.com/spreadsheets/d/1x…/edit#gid=0', last: 95,
-      text: 'Lakás, rezsi, autó, szoftver előfizetések. Claude Max x20: 200 USD havonta. Áram november: 18 420 Ft.' },
-    { id: 2, win: 1, group: 'siteview', icon: 'github', title: '5. munkacsomag: Képmentés (SI1, SI4) · Pull Request #4 · damndotrun/siteview', url: 'https://github.com/damndotrun/siteview/pull/4', last: 41,
+      text: 'Lakás, rezsi, autó, szoftver előfizetések. Claude Max x20: 200 USD havonta. Áram november: 18 420 Ft. Légcsatorna anyag a Kovács lakáshoz (félmerev cső, idomok): 61 400 Ft.' },
+    { id: 2, win: 1, group: 'siteview', noSleep: true, icon: 'github', title: '5. munkacsomag: Képmentés (SI1, SI4) · Pull Request #4 · damndotrun/siteview', url: 'https://github.com/damndotrun/siteview/pull/4', last: 41,
       text: 'A háttér tölti le a kép bájtjait credentials: include beállítással, OffscreenCanvas-on konvertál; JPG-nél az átlátszó rész fehér. Öt saját döntés a leírásban.' },
     { id: 3, win: 1, group: 'siteview', icon: 'wxt', title: 'Content Script UI – WXT', url: 'https://wxt.dev/guide/key-concepts/content-script-ui.html', last: 0, active: true,
       text: 'createShadowRootUi isolates your UI from the page styles. The shadow root is attached to a custom element; use cssInjectionMode: "ui" to load your CSS into it.' },
@@ -35,7 +35,7 @@ window.SV = (function () {
       text: 'faster-whisper is a reimplementation of OpenAI’s Whisper model using CTranslate2. This implementation is up to 4 times faster than openai/whisper for the same accuracy while using less memory. vad_filter=True' },
     { id: 10, win: 1, group: 'felirat', icon: 'github', title: 'yt-dlp/README.md at master · yt-dlp/yt-dlp', url: 'https://github.com/yt-dlp/yt-dlp/blob/master/README.md', last: 1440 + 60, discarded: true,
       text: 'FORMAT SELECTION: -f "bestaudio/worst" downloads the best audio-only format, or the worst video if none is available. --cookies-from-browser BROWSER' },
-    { id: 11, win: 1, group: 'felirat', icon: 'huggingface', title: 'Systran/faster-whisper-small.en · Hugging Face', url: 'https://huggingface.co/Systran/faster-whisper-small.en', last: 1440 + 61, discarded: true, unread: true,
+    { id: 11, win: 1, group: 'felirat', icon: 'huggingface', title: 'Systran/faster-whisper-small.en · Hugging Face', url: 'https://huggingface.co/Systran/faster-whisper-small.en', last: 1440 + 61, discarded: true,
       text: 'Whisper small.en model for CTranslate2. This repository contains the conversion of openai/whisper-small.en to the CTranslate2 model format.' },
     { id: 12, win: 1, group: 'porszivo', icon: null, title: 'Philips XC3131/01 Series 3000 akkus álló porszívó – Árak – Árukereső.hu', url: 'https://www.arukereso.hu/porszivo-c3045/philips/xc3131-01-p869321541/', last: 23,
       fields: { ar: 54990 },
@@ -46,7 +46,7 @@ window.SV = (function () {
     { id: 14, win: 1, group: 'porszivo', icon: 'mediamarkt', title: 'XIAOMI Robot Vacuum S20+ robotporszívó, fehér - MediaMarkt', url: 'https://www.mediamarkt.hu/hu/product/_xiaomi-robot-vacuum-s20-1462190.html', last: 27,
       fields: { ar: 119999 },
       text: 'LDS lézeres navigáció, 6000 Pa szívóerő, automatikus portalanító állomás. Online ár: 119 999 Ft. Készleten, holnap átvehető.' },
-    { id: 15, win: 1, group: 'porszivo', icon: null, title: 'Tefal X-Force Flex 9.60 Aqua TY2039WO kézi porszívó | Alza.hu', url: 'https://www.alza.hu/tefal-x-force-flex-9-60-aqua-ty2039wo-d7302245.htm', last: 25, discarded: true, unread: true,
+    { id: 15, win: 1, group: 'porszivo', icon: null, title: 'Tefal X-Force Flex 9.60 Aqua TY2039WO kézi porszívó | Alza.hu', url: 'https://www.alza.hu/tefal-x-force-flex-9-60-aqua-ty2039wo-d7302245.htm', last: 25, discarded: true,
       fields: { ar: 89990 },
       text: 'Hajlítható cső a bútorok alá. Felmosó fej Aqua funkcióval. Ciklonos szűrés, mosható szűrő. Ár: 89 990 Ft.' },
     { id: 16, win: 1, group: null, icon: 'autodeskrevit', title: 'Duct Class – Revit API 2024', url: 'https://www.revitapidocs.com/2024/duct-class.htm', last: 300,
@@ -121,18 +121,42 @@ window.SV = (function () {
   }
   const extracted = tabs.filter((t) => t.text).length;
 
-  // Claude összefoglaló a WXT oldalról (CS4: teljes oldal).
+  // Claude összefoglaló a WXT oldalról (CS4: teljes oldal), az alap mentett prompttal (CS5: „Összefoglaló (magyarul,
+  // pontokban)”). A válasz szavanként érkezik; a prototípus „Összefoglaló” állapota a 60%-ánál indul.
   const summary = {
     source: 'Content Script UI – WXT',
     domain: 'wxt.dev',
-    paragraphs: [
-      'Az oldal azt mutatja be, hogyan tehetsz saját felületet egy weboldalba úgy, hogy az oldal stílusa ne rontsa el.',
-      'Három út van: az integrált (az oldal stílusai rád is hatnak), a Shadow Root (a createShadowRootUi elszigeteli a felületet, a CSS a cssInjectionMode: "ui" beállítással kerül bele), és az IFrame (teljes elszigetelés, de lassabb és nehezebb üzenni vele).',
-      'A Siteview HUD-jához és elemkijelölőjéhez a Shadow Root a megfelelő: gyors, és az oldal CSS-e nem ér el hozzá. Figyelni kell, hogy a',
+    items: [
+      'Az oldal arról szól, hogyan tehetsz saját felületet egy weboldalba úgy, hogy az oldal stílusa ne rontsa el.',
+      'Három út van: integrált (az oldal stílusai rád is hatnak), Shadow Root és IFrame.',
+      'Shadow Root: a createShadowRootUi elszigeteli a felületet, a CSS a cssInjectionMode: "ui" beállítással kerül bele. Gyors, és az oldal CSS-e nem ér el hozzá.',
+      'IFrame: teljes elszigetelés, de lassabb, és a tartalomszkript csak üzenettel ér el hozzá.',
+      'Ha az oldal átírja a DOM-ot, az autoMount() egy horgonyelem-választóval újra felteszi a felületet.',
     ],
   };
-  // Generált felirat darabjai (SG6: darabonként érkezik).
-  const subtitle = { line: 'with int8 quantization the small model runs on the CPU', pct: 42, step: 'Átírás' };
+  // Mentett promptok (CS5): a spec csak az alapot adja meg.
+  const prompts = ['Összefoglaló (magyarul, pontokban)'];
+  // A generált felirat darabjai (SG6: darabonként érkezik), mp-ben. A videó 41:10 hosszú.
+  const transcript = [
+    [0, 'Hi everyone, today we are going to transcribe one hour of English audio on a laptop CPU.'],
+    [41, 'First the baseline: openai-whisper with the small.en model, no GPU at all.'],
+    [135, 'That took fifty-eight minutes, so basically real time.'],
+    [242, 'Now let us install faster-whisper. It uses CTranslate2 under the hood.'],
+    [390, 'Same model, same audio, float32 on four threads: sixteen minutes.'],
+    [588, 'The next step is quantization. We switch the compute type to int8,'],
+    [724, 'and with int8 quantization the small model runs on the CPU'],
+    [810, 'with the same accuracy: the word error rate moved from 4.1 to 4.2 percent.'],
+    [912, 'Finally, the VAD filter skips the silent parts before transcription.'],
+    [1015, 'With VAD on, the whole hour is done in about five minutes.'],
+    [1120, 'Memory use stays under one gigabyte for small.en in int8.'],
+    [1265, 'Beam size five is the default; beam size one is faster but a bit less accurate.'],
+    [1470, 'On a GPU this would take seconds, but the point is that the CPU is enough.'],
+    [1690, 'You can stream the segments as they come, so subtitles appear while it runs.'],
+    [1965, 'Batching helps on long files, but it needs more memory.'],
+    [2180, 'I put the script and the timings in the description.'],
+    [2402, 'Thanks for watching, see you in the next one.'],
+  ];
+  const subtitle = { line: 'and with int8 quantization the small model runs on the CPU' };
 
   // Modulindítók (a spec moduljai). Billentyű csak ott, ahol a spec megadja.
   const modules = [
@@ -164,5 +188,5 @@ window.SV = (function () {
     });
   }
 
-  return { modules, moduleOrder, sortable, groups, groupColor, tabs, domain, ago, huf, fold, esc, mark, snippet, search, favicon, extracted, summary, subtitle };
+  return { modules, moduleOrder, sortable, groups, groupColor, tabs, domain, ago, huf, fold, esc, mark, snippet, search, favicon, extracted, summary, prompts, transcript, subtitle };
 })();
