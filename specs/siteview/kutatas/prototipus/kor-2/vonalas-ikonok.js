@@ -24,5 +24,10 @@ window.SV_LINE = {"globe":"<circle cx=\"12\" cy=\"12\" r=\"10\" /><path d=\"M12 
   "sun":"<circle cx=\"12\" cy=\"12\" r=\"4\" /><path d=\"M12 2v2\" /><path d=\"M12 20v2\" /><path d=\"m4.93 4.93 1.41 1.41\" /><path d=\"m17.66 17.66 1.41 1.41\" /><path d=\"M2 12h2\" /><path d=\"M20 12h2\" /><path d=\"m6.34 17.66-1.41 1.41\" /><path d=\"m19.07 4.93-1.41 1.41\" />",
   "chevron-right":"<path d=\"m9 18 6-6-6-6\" />",
   "square":"<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\" />",
+  "app-window":"<rect x=\"2\" y=\"4\" width=\"20\" height=\"16\" rx=\"2\" /> <path d=\"M10 4v4\" /> <path d=\"M2 8h20\" /> <path d=\"M6 4v4\" />",
+  "square-stack":"<path d=\"M4 10c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h4c1.1 0 2 .9 2 2\" /> <path d=\"M10 16c-1.1 0-2-.9-2-2v-4c0-1.1.9-2 2-2h4c1.1 0 2 .9 2 2\" /> <rect width=\"8\" height=\"8\" x=\"14\" y=\"14\" rx=\"2\" />",
+  "bookmark":"<path d=\"m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z\" />",
+  "square-arrow-out-up-right":"<path d=\"M21 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6\" /> <path d=\"m21 3-9 9\" /> <path d=\"M15 3h6v6\" />",
+  "plus":"<path d=\"M5 12h14\" /> <path d=\"M12 5v14\" />",
   "square-check":"<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\" /> <path d=\"m9 12 2 2 4-4\" />"};
 window.lineIcon = function (name, size, cls) { return `<svg class="li ${cls || ""}" viewBox="0 0 24 24" width="${size || 16}" height="${size || 16}" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${window.SV_LINE[name]}</svg>`; };

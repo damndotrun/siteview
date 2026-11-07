@@ -1,0 +1,548 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>B, változtatásokkal</title>
+<link rel="stylesheet" href="../keret.css">
+<style>
+/* Keret (nem az irány része): a két saját állapottal 11 link van; az URL-mező rövidül, hogy kiférjenek. */
+.topbar .proto { flex-shrink: 0; }
+/* A választott B tokenjei: vizualis-irany.md „Választott: B, változtatásokkal” Tokenek. Csak ezek használhatók. */
+:root {
+  --b2-bg:#ffffff; --b2-text:#3a3c40; --b2-strong:#2f3033; --b2-sec:#8a8a8a; --b2-icon:#6b6b6b; --b2-line:#edeef0;
+  --b2-border:#e8e8e8; --b2-side:#f8f8f8; --b2-hover:#f8f8f8; --b2-btn2:#f2f2f2; --b2-primary:#161616;
+  --b2-cursor-bg:#eef3f9; --b2-cursor-bar:#c4c8ea; --b2-selected:#dfeaf7; --b2-label:#a8a8a8;
+  --b2-pop-shadow:0 6px 20px rgba(0,0,0,.08); --b2-radius:4px; --b2-radius-btn:6px; --b2-on-primary:#ffffff;
+  --b2-player-bg:#000000;
+  --b2-seek:#ff9000; --b2-seek-track:rgba(255,255,255,.4); --b2-seek-mark:rgba(0,0,0,.5);
+  --b2-seek-h:2px; --b2-seek-h-action:6px; --b2-seek-inset:16px;
+  --b2-osd:#201f1f; --b2-osd-text:#ffffff; --b2-osd-radius:3px;
+  --b2-font:"Segoe UI",system-ui,sans-serif; --b2-title:600 13px/1.3 var(--b2-font); --b2-meta:400 12px/1.3 var(--b2-font);
+  --b2-search:400 15px/1 var(--b2-font); --b2-head:600 12px/1 var(--b2-font); --b2-osd-font:400 16px/19px var(--b2-font);
+  --b2-zone-font:400 11px/1.35 var(--b2-font); --b2-doc-title:600 15px/1.3 var(--b2-font); --b2-label-font:600 9px/1.2 var(--b2-font);
+}
+[hidden] { display: none !important; } /* a rejtett előnézet akkor is rejtve, ha az osztálya flex */
+.b2 { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; height: 100%; background: var(--b2-bg); color: var(--b2-text); font: 400 13px/1.35 var(--b2-font); }
+button { font: inherit; color: inherit; }
+.main { grid-column: 2; grid-row: 1; container-type: inline-size; min-width: 0; min-height: 0; display: flex; flex-direction: column; }
+.sp { flex: 1; }
+.ib { flex: none; position: relative; min-width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; gap: 2px; border: 0; background: none; padding: 0 4px; color: var(--b2-icon); cursor: pointer; border-radius: var(--b2-radius); }
+.ib:hover, .ib.on { color: var(--b2-strong); }
+.ib small { font: 600 11px/1 var(--b2-font); }
+.ib.sm { min-width: 22px; height: 22px; }
+.kbd { font: 400 11px/1 var(--b2-font); color: var(--b2-label); }
+/* Keresőmező mindig nyitva (Matter), jobbra az ablakkapcsoló, a Szűrő és a Rendezés ikonja (Programa „Search · Filter · Sort”) */
+.top { flex: none; display: flex; align-items: center; gap: 2px; height: 48px; padding: 0 6px 0 24px; border-bottom: 1px solid var(--b2-line); }
+.top .si { color: var(--b2-sec); flex: none; }
+.top input { flex: 1; min-width: 0; height: 100%; margin-left: 8px; border: 0; outline: 0; background: none; font: var(--b2-search); color: var(--b2-strong); }
+.top input::placeholder { color: var(--b2-sec); }
+/* Bekapcsolt szűrők: egy sor a kereső alatt */
+.filt { flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; padding: 8px 12px 0 24px; font: var(--b2-meta); color: var(--b2-sec); }
+.filt span { display: inline-flex; align-items: center; color: var(--b2-text); }
+.filt .x { border: 0; background: none; padding: 0 0 0 2px; color: var(--b2-sec); cursor: pointer; display: grid; }
+.tb { border: 0; background: none; padding: 0; font: var(--b2-meta); color: var(--b2-icon); cursor: pointer; white-space: nowrap; }
+.tb:hover { color: var(--b2-strong); }
+.list { flex: 1; min-height: 0; overflow: auto; padding-bottom: 12px; }
+/* Ablak és csoportfejléc: a Programa (C) szakaszcíme, a nyíl a bal szélen; jobbra rámutatásra a gyorsgombok */
+.wl { padding: 16px 12px 0 24px; font: 600 13px/1 var(--b2-font); color: var(--b2-strong); }
+.wl .n { font-weight: 400; color: var(--b2-sec); }
+.gh { display: flex; align-items: center; gap: 6px; height: 34px; margin-top: 8px; padding: 0 6px 0 8px; font: var(--b2-head); color: var(--b2-strong); cursor: pointer; user-select: none; }
+.gh .chev { color: var(--b2-sec); flex: none; }
+.gh i { width: 6px; height: 6px; border-radius: 50%; flex: none; }
+.gh .gn { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gh .n, .sh .n { font-weight: 400; color: var(--b2-sec); }
+.gh .qbs { margin-left: auto; display: none; gap: 0; }
+.gh:hover .qbs, .gh:focus-within .qbs { display: flex; }
+.qb { width: 24px; height: 24px; display: grid; place-items: center; border: 0; background: none; padding: 0; color: var(--b2-icon); cursor: pointer; border-radius: var(--b2-radius); }
+.qb:hover { color: var(--b2-strong); }
+.dens-kompakt .gh { height: 28px; margin-top: 4px; }
+/* Találatok: darabszám, majd az ok szerinti szakaszok (Coda), a C szakaszcímével */
+.cntl { margin: 0; padding: 12px 12px 0 24px; font: var(--b2-meta); color: var(--b2-sec); }
+.sh { display: flex; align-items: baseline; gap: 6px; padding: 16px 12px 6px 24px; font: var(--b2-head); color: var(--b2-strong); }
+.hint { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0; padding: 12px 12px 4px 24px; font: var(--b2-meta); color: var(--b2-sec); }
+.empty { padding: 14px 14px 4px 24px; }
+.empty .h { font: var(--b2-title); color: var(--b2-strong); margin-bottom: 4px; }
+.empty p { margin: 0 0 10px; font: var(--b2-meta); color: var(--b2-sec); }
+/* Egy tab egy sor (Superhuman): favicon, cím, ár, szürke rész, állapotjelek, idő jobbra */
+.row { position: relative; display: flex; align-items: center; gap: 8px; height: 34px; padding: 0 12px 0 24px; font: var(--b2-title); color: var(--b2-strong); cursor: pointer; white-space: nowrap; user-select: none; }
+.row.cur { background: var(--b2-cursor-bg); }
+.row.cur::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--b2-cursor-bar); }
+.row.sel { background: var(--b2-selected); }
+.row > .fav, .row > .ck { flex: none; }
+.row .fav-none { color: var(--b2-label); }
+.row .ck { color: var(--b2-strong); }
+.row .t { flex: 0 1 auto; max-width: 60%; overflow: hidden; text-overflow: ellipsis; }
+.row.slept .t { color: var(--b2-sec); font-weight: 400; }
+.row .pr, .row .d, .row .time { font: var(--b2-meta); color: var(--b2-sec); }
+.row .pr { flex: none; }
+.row .d { flex: 1 1 0; min-width: 6ch; overflow: hidden; text-overflow: ellipsis; }
+.row .d b, .row .t b { font-weight: 600; color: var(--b2-strong); }
+.row .st { flex: none; color: var(--b2-label); display: flex; gap: 4px; }
+.row .st span { display: grid; }
+.row .time { flex: none; min-width: 34px; text-align: right; }
+.row .acts { display: none; flex: none; gap: 2px; }
+.row .acts button { width: 24px; height: 24px; display: grid; place-items: center; border: 0; background: none; color: var(--b2-icon); cursor: pointer; }
+.row .acts button:hover { color: var(--b2-strong); }
+.row:hover .acts { display: flex; }
+.row:hover .time { display: none; }
+.res .t { max-width: 45%; }
+.dens-kompakt .row { height: 28px; }
+@container (max-width: 340px) { .row:not(.res) .d { display: none; } .row:not(.res) .t { flex: 1 1 0; max-width: none; } .res .st { display: none; } .res .t { max-width: 36%; } }
+/* Futó felirat a videós tab alatt: folyamatkör, állapot, Átirat, Megszakítás (C) */
+.jobl { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; padding: 2px 12px 8px 46px; font: var(--b2-meta); color: var(--b2-text); }
+.jobl .bs { display: flex; gap: 6px; }
+.ring { width: 11px; height: 11px; border-radius: 50%; border: 1px solid var(--b2-strong); flex: none; display: inline-block; }
+.btn2 { border: 0; background: var(--b2-btn2); color: var(--b2-strong); font: var(--b2-meta); padding: 6px 9px; border-radius: var(--b2-radius-btn); cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 5px; }
+.btn2:disabled { color: var(--b2-label); cursor: default; }
+.btn1 { border: 0; background: var(--b2-primary); color: var(--b2-on-primary); font: 600 12px/1 var(--b2-font); padding: 8px 12px; border-radius: var(--b2-radius-btn); cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; }
+/* Kijelölési sáv és visszajelzés a lista alján (C) */
+.selb, .note { flex: none; display: flex; align-items: center; gap: 8px; padding: 8px 10px 8px 24px; border-top: 1px solid var(--b2-border); }
+.selb .tx, .note .tx { flex: 1; min-width: 0; font: var(--b2-meta); color: var(--b2-sec); }
+.selb .tx b { color: var(--b2-strong); }
+/* Alsó sor: csak az indítók és a „⋯”, a teljes szélességben elosztva */
+.bottom { grid-column: 1 / -1; grid-row: 2; display: flex; align-items: stretch; height: 40px; border-top: 1px solid var(--b2-line); }
+.bottom .mods { display: contents; }
+.mb { flex: 1 1 0; min-width: 0; display: flex; align-items: center; justify-content: center; gap: 4px; border: 0; background: none; padding: 0; color: var(--b2-icon); cursor: pointer; }
+.mb:hover { color: var(--b2-strong); }
+.mb .pct { font: 600 12px/1 var(--b2-font); color: var(--b2-strong); }
+/* Csoportsáv (bekapcsolható): a csoportok függőlegesen, a Turo keskeny sávjának szerkezetével, a Programa oldalsáv színével */
+.rail { grid-column: 1; grid-row: 1; width: 64px; min-height: 0; overflow-y: auto; scrollbar-width: none; display: flex; flex-direction: column; gap: 2px; padding: 8px 0; background: var(--b2-side); border-right: 1px solid var(--b2-border); }
+.ri { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 7px 4px; border: 0; background: none; cursor: pointer; text-align: center; color: var(--b2-sec); }
+.ri i { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.ri i.all { border: 1px solid var(--b2-sec); }
+.ri i.none { border: 1px dashed var(--b2-sec); }
+.ri .rn { font: 400 11px/1.2 var(--b2-font); max-width: 100%; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.ri .rc { font: 400 10px/1 var(--b2-font); }
+.ri:hover { color: var(--b2-strong); }
+.ri.on { color: var(--b2-strong); }
+.ri.on .rn { font-weight: 600; }
+.ri.on i.all, .ri.on i.none { border-color: var(--b2-strong); }
+/* Összefoglaló, átirat, zónák: a C lapja („← Tabok / …”), mezősor */
+.bc { flex: none; display: flex; align-items: center; gap: 6px; height: 48px; padding: 0 12px 0 18px; color: var(--b2-sec); white-space: nowrap; border-bottom: 1px solid var(--b2-line); }
+.bc .cr { display: inline-flex; align-items: center; gap: 4px; border: 0; background: none; padding: 0; font: 400 13px/1 var(--b2-font); color: var(--b2-sec); cursor: pointer; }
+.bc .cr:hover { color: var(--b2-strong); }
+.bc .cur { font: 600 13px/1 var(--b2-font); color: var(--b2-strong); }
+.doc { flex: 1; min-height: 0; overflow: auto; padding: 14px 14px 16px 24px; }
+.doc h2 { margin: 0 0 8px; font: var(--b2-doc-title); color: var(--b2-strong); }
+.fields { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 4px 0 12px; margin-bottom: 12px; border-bottom: 1px solid var(--b2-border); }
+.f { min-width: 0; }
+.f .v { font: 400 13px/1.2 var(--b2-font); color: var(--b2-strong); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 170px; }
+.f .l { margin-top: 3px; font: var(--b2-label-font); letter-spacing: .06em; text-transform: uppercase; color: var(--b2-label); }
+.run { display: inline-flex; align-items: center; gap: 6px; font: var(--b2-meta); color: var(--b2-text); }
+.doc ul { margin: 0 0 12px; padding-left: 18px; }
+.doc li, .doc .qa p { margin: 0 0 9px; font: 400 13px/1.6 var(--b2-font); color: var(--b2-text); }
+.doc .qa { border-top: 1px solid var(--b2-border); padding-top: 10px; }
+.doc .qa .q { font: var(--b2-title); color: var(--b2-strong); margin-bottom: 4px; }
+.mut { margin: 0 0 10px; font: var(--b2-meta); color: var(--b2-sec); }
+.tr { width: 100%; border-collapse: collapse; }
+.tr td { padding: 7px 8px 7px 0; border-bottom: 1px solid var(--b2-border); font: 400 13px/1.45 var(--b2-font); color: var(--b2-text); vertical-align: top; }
+.tr tr { cursor: pointer; }
+.tr tr:hover td { background: var(--b2-hover); }
+.tr td.ts { width: 44px; color: var(--b2-sec); font-variant-numeric: tabular-nums; }
+.ask { flex: none; padding: 8px 10px 10px 24px; border-top: 1px solid var(--b2-border); }
+.ask .pr { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.ask .ar { display: flex; gap: 6px; }
+.ask input { flex: 1; min-width: 0; height: 30px; border: 1px solid var(--b2-border); border-radius: var(--b2-radius); padding: 0 8px; font: 400 13px var(--b2-font); color: var(--b2-strong); outline: 0; }
+/* Videó zónái: bemenetenként egy rács a Video Dominator zónabeállításának szerkezetével, a lap külsejével */
+.zs { margin: 4px 0 18px; }
+.zh { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.zh .sh { padding: 0; }
+.zg { display: grid; aspect-ratio: 16 / 9; border: 1px solid var(--b2-border); border-radius: var(--b2-radius); overflow: hidden; }
+.zc { min-width: 0; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 4px; border: 0; border-right: 1px solid var(--b2-border); border-bottom: 1px solid var(--b2-border); background: none; font: var(--b2-zone-font); color: var(--b2-text); text-align: center; cursor: pointer; overflow: hidden; }
+.zc.lc { border-right: 0; }
+.zc.lr { border-bottom: 0; }
+.zc:hover { background: var(--b2-hover); }
+.zc .za { display: grid; grid-template-columns: auto auto; column-gap: 3px; text-align: left; } /* görgő: ↑ vagy ↓, mellette a művelet; tördeléskor a művelet alatt folytatódik */
+.zc .zb { display: flex; flex-direction: column; } /* gomb: a művelet, alatta a bemenet */
+.zc .e, .zc .in { color: var(--b2-sec); }
+/* Felugró menü: a Programa „Sort by” felugrója; jelölőnégyzet, mint a kijelölt soron */
+.menu { position: absolute; z-index: 10; min-width: 210px; max-width: 280px; overflow: auto; background: var(--b2-bg); border: 1px solid var(--b2-border); border-radius: var(--b2-radius-btn); box-shadow: var(--b2-pop-shadow); padding: 6px 0; }
+.menu .mh { padding: 10px 12px 6px; font: var(--b2-head); color: var(--b2-strong); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.menu .mh:first-child { padding-top: 6px; }
+.menu .mi { width: 100%; display: flex; align-items: center; gap: 8px; height: 28px; padding: 0 12px; border: 0; background: none; font: var(--b2-meta); color: var(--b2-text); text-align: left; cursor: pointer; white-space: nowrap; }
+.menu .mi:hover { background: var(--b2-hover); }
+.menu .mi:disabled { color: var(--b2-label); cursor: default; background: none; }
+.menu .mi .ck { width: 14px; display: grid; flex: none; color: var(--b2-icon); }
+.menu .mi.on .ck { color: var(--b2-strong); }
+.menu .mi i { width: 6px; height: 6px; border-radius: 50%; flex: none; }
+.menu .mi .n { margin-left: auto; color: var(--b2-sec); }
+.menu .ms { height: 1px; background: var(--b2-border); margin: 6px 0; }
+.menu .mnote { padding: 6px 12px 4px; color: var(--b2-sec); font: 400 11px/1.35 var(--b2-font); white-space: normal; }
+.menu .mp { display: flex; align-items: center; gap: 6px; padding: 2px 12px 6px 34px; font: var(--b2-meta); color: var(--b2-text); }
+.menu .mp input { width: 100px; height: 28px; border: 1px solid var(--b2-border); border-radius: var(--b2-radius); font: var(--b2-meta); color: var(--b2-strong); background: var(--b2-bg); padding: 0 6px; outline: 0; }
+.menu .mz { display: flex; align-items: center; gap: 8px; min-height: 30px; padding: 2px 8px 2px 12px; font: var(--b2-meta); color: var(--b2-text); }
+.menu .mz .zl { flex: 1; min-width: 0; }
+.chip { flex: none; display: inline-flex; align-items: center; gap: 4px; padding: 4px 4px 4px 8px; background: var(--b2-btn2); border-radius: var(--b2-radius); font: var(--b2-meta); color: var(--b2-strong); white-space: nowrap; }
+.chip button { border: 0; background: none; padding: 0; display: grid; color: var(--b2-icon); cursor: pointer; }
+.chip button:hover { color: var(--b2-strong); }
+/* A videón: csak a visszajelzés, középen, a Video Dominator időcímkéjének formájában (Action Info) */
+.osd { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 3; padding: 4px 9px; border-radius: var(--b2-osd-radius); background: var(--b2-osd); color: var(--b2-osd-text); font: var(--b2-osd-font); white-space: nowrap; pointer-events: none; }
+/* Saját lejátszó (VD8): csak a videó és alul a folyamatsáv; rámutatásra vastagabb, előnézet és időcímke */
+.player { position: absolute; inset: 0; z-index: 5; display: grid; place-items: center; background: var(--b2-player-bg); container-type: size; }
+.player.full { position: fixed; z-index: 60; }
+.player .video { width: min(100cqw, calc(100cqh * 16 / 9)); max-width: none; border-radius: 0; }
+.seek { position: absolute; left: var(--b2-seek-inset); right: var(--b2-seek-inset); bottom: calc(var(--b2-seek-inset) - 8px); height: 22px; z-index: 2; cursor: pointer; }
+.seek .trk { position: absolute; left: 0; right: 0; bottom: 8px; height: var(--b2-seek-h); border-radius: 3px; background: var(--b2-seek-track); }
+.seek.hover .trk, .seek.act .trk { height: var(--b2-seek-h-action); }
+.seek .trk b { position: absolute; left: 0; top: 0; bottom: 0; border-radius: inherit; background: var(--b2-seek); }
+.seek .trk u { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--b2-seek-mark); }
+.prev { position: absolute; bottom: calc(8px + var(--b2-seek-h-action) + 17px); width: 160px; display: flex; flex-direction: column; align-items: center; gap: 4px; pointer-events: none; }
+.pimg { position: relative; width: 160px; height: 90px; overflow: hidden; border: 2px solid var(--b2-osd); border-radius: var(--b2-osd-radius); background: #f7f7f5; /* a videókép háttere (keret) */ }
+.pimg .slide { inset: auto; left: 0; top: 0; transform-origin: 0 0; }
+.plabel { padding: 4px 9px; border-radius: var(--b2-osd-radius); background: var(--b2-osd); color: var(--b2-osd-text); font: var(--b2-osd-font); white-space: nowrap; }
+</style>
+</head>
+<body>
+<script src="../ikonok.js"></script>
+<script src="../vonalas-ikonok.js"></script>
+<script src="../adat.js"></script>
+<script src="../mukodes.js"></script>
+<script src="../keret.js"></script>
+<script>
+(function () {
+  const esc = SV.esc, st = M.st, fmt = Keret.fmt;
+  // Az utolsó használat órával vagy dátummal (Superhuman „AUG 25”), kisbetűvel. A prototípus „most”-ja rögzített.
+  const NOW = new Date(2026, 10, 7, 15, 20);
+  const MON = ['jan.', 'febr.', 'márc.', 'ápr.', 'máj.', 'jún.', 'júl.', 'aug.', 'szept.', 'okt.', 'nov.', 'dec.'];
+  function clock(t) {
+    if (t.active) return 'most';
+    const d = new Date(NOW - t.last * 60000);
+    const day = (x) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+    const diff = Math.round((day(NOW) - day(d)) / 86400000);
+    if (diff === 0) return `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
+    if (diff === 1) return 'tegnap';
+    return `${MON[d.getMonth()]} ${d.getDate()}.`;
+  }
+  function boldHit(text, q) { return SV.mark(text, q, 'x').replace(/<mark class="x">/g, '<b>').replace(/<\/mark>/g, '</b>'); }
+  function fromHit(text, q) { // a szürke részlet a talált szónál kezdődik
+    const j = SV.fold(text).indexOf(SV.fold(q));
+    if (j < 0) return esc(text);
+    return (j > 0 ? '…' : '') + boldHit(text.slice(j, j + q.length + 60), q);
+  }
+  // A videón az idő a Video Dominator alakjában („05:11”, „12:09 / 41:10”).
+  function osdTime(s) { s = Math.max(0, Math.round(s)); const h = Math.floor(s / 3600), m = Math.floor(s / 60) % 60, r = s % 60, p = (x) => String(x).padStart(2, '0'); return (h ? h + ':' : '') + p(m) + ':' + p(r); }
+  const ring = (p) => `<span class="ring" style="background:conic-gradient(var(--b2-strong) ${p}%, transparent 0)"></span>`;
+  const field = (v, l) => `<div class="f"><div class="v">${v}</div><div class="l">${l}</div></div>`;
+
+  // Karesz beállításai: a csoportsáv és a csoportfejléc gyorsgombjai (a „⋯” menüben), böngészőnként megmaradnak.
+  const load = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : v; } catch (e) { return d; } };
+  const save = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+  const QUICK = [['altatas', 'Altatás', 'moon', 'sleepGroup'], ['mentes', 'Mentés munkamenetként', 'bookmark', 'saveGroup'], ['athelyezes', 'Áthelyezés másik ablakba', 'square-arrow-out-up-right', null]];
+  const pref = { rail: load('sv-b2-sav', '0') === '1', quick: load('sv-b2-gyors', 'altatas,mentes,athelyezes').split(',').filter(Boolean) };
+  const view = { rail: pref.rail };
+
+  // --- Videó zónái (VD2 a Video Dominator mintájára): Karesz saját beállítása, a képeiről --------------------------
+  const ACTIONS = {
+    hangFel5: { label: 'Hangerő +5%', fx: { vol: 5, kind: 'vol' } },
+    hangLe5: { label: 'Hangerő −5%', fx: { vol: -5, kind: 'vol' } },
+    hangLe10: { label: 'Hangerő −10%', fx: { vol: -10, kind: 'vol' } },
+    sebFel: { label: 'Sebesség +0,25×', fx: { speed: 0.25, kind: 'speed' } },
+    seb1: { label: 'Sebesség 1×', fx: { speedSet: 1, kind: 'speed' } },
+    elore5p: { label: 'Előre 5%', fx: { seekPct: 5, kind: 'seek' } },
+    vissza1p: { label: 'Vissza 1%', fx: { seekPct: -1, kind: 'seek' } },
+    elore30: { label: 'Előre 30 mp', fx: { seek: 30, kind: 'seek' } },
+    vissza10: { label: 'Vissza 10 mp', fx: { seek: -10, kind: 'seek' } },
+    elore10: { label: 'Előre 10 mp', fx: { seek: 10, kind: 'seek' } },
+    vissza5: { label: 'Vissza 5 mp', fx: { seek: -5, kind: 'seek' } },
+    lejatszas: { label: 'Lejátszás / szünet', fx: { play: true, kind: 'play' } },
+    ablak: { label: 'Saját lejátszó (ablak)', fx: { player: 'ablak' } },
+    teljes: { label: 'Saját lejátszó (teljes képernyő)', fx: { player: 'teljes' } },
+  };
+  const INPUTS = { fel: '↑ görgő', le: '↓ görgő', bal: 'Bal gomb', kozep: 'Középső gomb', jobb: 'Jobb gomb', 'alt-bal': 'Alt + bal', 'alt-kozep': 'Alt + középső', 'alt-jobb': 'Alt + jobb' };
+  const FREE = { gorgo: ['fel', 'le'], gombok: ['bal', 'kozep', 'jobb', 'alt-bal', 'alt-kozep', 'alt-jobb'] };
+  const KINDS = { gorgo: ['hangFel5', 'hangLe5', 'hangLe10', 'sebFel', 'seb1', 'elore5p', 'vissza1p', 'elore10', 'vissza5', 'elore30', 'vissza10'], gombok: ['lejatszas', 'ablak', 'teljes'] };
+  const zones = {
+    gorgo: { title: 'Görgő', rows: 2, cols: 3, rowSizes: [2, 1], cells: {
+      '1-1': [['hangFel5', 'fel'], ['hangLe10', 'le']], '1-2': [['hangFel5', 'fel'], ['hangLe5', 'le']], '1-3': [['sebFel', 'fel'], ['seb1', 'le']],
+      '2-1': [['elore5p', 'fel'], ['vissza1p', 'le']], '2-2': [['elore30', 'fel'], ['vissza10', 'le']], '2-3': [['elore10', 'fel'], ['vissza5', 'le']] } },
+    gombok: { title: 'Egérgombok', rows: 2, cols: 2, rowSizes: [42, 58], cells: {
+      '1-1': [['ablak', 'alt-kozep'], ['lejatszas', 'bal']], '1-2': [['ablak', 'alt-kozep'], ['lejatszas', 'bal']],
+      '2-1': [['teljes', 'alt-kozep'], ['lejatszas', 'bal']], '2-2': [['teljes', 'alt-kozep'], ['lejatszas', 'bal']] } },
+  };
+  const GRIDS = [[1, 1], [1, 2], [1, 3], [2, 2], [2, 3], [3, 3]];
+  const rowSizes = (g) => (g.rows === 2 && g.rowSizes ? g.rowSizes : Array(g.rows).fill(1));
+  const cellName = (cell) => { const [r, c] = cell.split('-'); return `${r}. sor, ${c}. oszlop`; };
+  function cellAt(g, fx, fy) {
+    const rs = rowSizes(g), tot = rs.reduce((a, b) => a + b, 0);
+    let acc = 0, r = g.rows;
+    for (let i = 0; i < rs.length; i++) { acc += rs[i] / tot; if (fy < acc) { r = i + 1; break; } }
+    return `${r}-${Math.min(g.cols, Math.floor(fx * g.cols) + 1)}`;
+  }
+  // A keret kérdezi: a kurzor helyén, ezzel a bemenettel mi történik (görgő iránya, egérgomb módosítóval).
+  function zoneAction(input, fx, fy, step) {
+    const key = input === 'gorgo' ? 'gorgo' : 'gombok', g = zones[key];
+    const want = input === 'gorgo' ? (step > 0 ? 'fel' : 'le') : input;
+    const list = (g.cells[cellAt(g, fx, fy)] || []).filter(([, i]) => i === want);
+    if (!list.length) return null;
+    const z = { side: 'zona', step };
+    list.forEach(([a]) => Object.assign(z, ACTIONS[a].fx));
+    return z;
+  }
+
+  // --- Panel ------------------------------------------------------------------------------------------------
+  function jobLine(t) {
+    const j = M.job();
+    if (!j || j.state !== 'fut' || t.id !== M.VIDEO_TAB) return '';
+    return `<div class="jobl">${ring(j.pct)}<span>${M.jobText()}</span><span class="bs"><button class="btn2" data-op="jobOpen">Átirat</button><button class="btn2" data-op="jobCancel">Megszakítás</button></span></div>`;
+  }
+  function row(t, r, q) {
+    const sel = st.sel.has(t.id);
+    const cls = ['row', t.active ? 'cur' : '', sel ? 'sel' : '', t.discarded ? 'slept' : '', r ? 'res' : ''].join(' ');
+    const title = r && r.inTitle ? boldHit(t.title, q) : esc(t.title);
+    const p = M.price(t);
+    let grey = esc(SV.domain(t.url));
+    if (r && r.why === 'szoveg') grey = fromHit(t.text, q);
+    else if (r && r.why === 'url') grey = fromHit(t.url, q);
+    const states = M.states(t).map((s) => `<span title="${s.label}">${lineIcon(s.icon, 13)}</span>`).join('');
+    const right = r && t.win !== M.CUR ? `${t.win}. ablak` : clock(t);
+    const wake = t.discarded ? `<button data-op="wakeTab" data-arg="${t.id}" title="Ébresztés">${lineIcon('sun', 15)}</button>` : `<button data-op="sleepTab" data-arg="${t.id}" title="Altatás">${lineIcon('moon', 15)}</button>`;
+    return `<div class="${cls}" data-tab="${t.id}"${sel ? ' aria-selected="true"' : ''}>${sel ? lineIcon('square-check', 14, 'ck') : SV.favicon(t, 14)}<span class="t">${title}</span>${p ? `<span class="pr">${p}</span>` : ''}<span class="d">${grey}</span>${states ? `<span class="st">${states}</span>` : ''}<span class="time">${right}</span><span class="acts">${wake}<button data-rowmenu="${t.id}" title="Műveletek (vagy jobb klikk)">${lineIcon('ellipsis', 15)}</button></span></div>${r ? '' : jobLine(t)}`;
+  }
+  function headHTML(g) {
+    const real = g.key !== 'nincs' && g.key !== 'rogzitett'; // gyorsgomb csak a böngésző valódi csoportján
+    const q = real ? QUICK.filter(([k]) => pref.quick.includes(k)).map(([, label, icon, opn]) => (opn
+      ? `<button class="qb" data-op="${opn}" data-arg="${g.id}" title="${label}">${lineIcon(icon, 15)}</button>`
+      : `<button class="qb" data-menu="mozgatas" data-menu-arg="${g.id}" title="${label}">${lineIcon(icon, 15)}</button>`)).join('') : '';
+    return `<div class="gh" data-g="${g.id}" data-op="collapse" data-arg="${g.id}" title="${g.collapsed ? 'Kinyitás' : 'Összecsukás'}">${lineIcon(g.collapsed ? 'chevron-right' : 'chevron-down', 14, 'chev')}${g.color ? `<i style="background:${g.color}"></i>` : ''}<span class="gn">${esc(g.title)}</span><span class="n">${g.tabs.length}</span>${q ? `<span class="qbs">${q}</span>` : ''}</div>`;
+  }
+  function emptyHTML(e, extra) { return `<div class="empty"><div class="h">${e.title}</div><p>${esc(e.text)}</p><button class="btn2" data-op="${e.action.op}">${e.action.label}</button></div>${extra || ''}`; }
+  function listHTML() {
+    const secs = M.sections();
+    if (!secs.some((s) => s.shown)) return emptyHTML(M.emptyList());
+    let h = '';
+    for (const s of secs) {
+      if (st.win === 'mind') h += `<div class="wl">${s.title} <span class="n">${s.total}</span></div>`;
+      for (const g of s.groups) h += headHTML(g) + (g.collapsed ? '' : g.tabs.map((t) => row(t)).join(''));
+    }
+    return h;
+  }
+  // Kereséskor: a darabszám sora, a találatok az ok szerint (Cím, Szöveg, URL), alattuk a más ablak sora gombbal.
+  function resultsHTML(r) {
+    const hint = M.otherHint(r);
+    const hintH = hint ? `<p class="hint">${hint.text}<button class="btn2" data-op="${hint.op}" data-arg="${hint.arg}">${hint.label}</button></p>` : '';
+    if (!r.list.length) return emptyHTML(M.empty(r), hintH);
+    let h = `<p class="cntl">${M.countLine(r)}</p>`;
+    for (const [k, l] of [['cim', 'Cím'], ['szoveg', 'Szöveg'], ['url', 'URL']]) {
+      const xs = r.list.filter((x) => x.why === k);
+      if (xs.length) h += `<div class="sh">${l}<span class="n">${xs.length}</span></div>` + xs.map((x) => row(x.tab, x, r.q)).join('');
+    }
+    return h + hintH;
+  }
+  function topHTML() {
+    const nf = M.activeFilters().length, all = st.win === 'mind';
+    const pw = (document.querySelector('.panel-body') || {}).clientWidth || 400, wide = pw - (view.rail ? 64 : 0) >= 340;
+    return `<div class="top">${lineIcon('search', 16, 'si')}<input data-q value="${esc(st.q)}" placeholder="${wide ? 'Keresés: cím, URL, szöveg' : 'Keresés'}" aria-label="Keresés: cím, URL, szöveg (/)">${st.q ? `<button class="ib" data-op="clearQ" title="Keresés törlése (Esc)">${lineIcon('x', 15)}</button>` : ''}`
+      + `<button class="ib ${all ? 'on' : ''}" data-op="win" data-arg="${all ? 'ez' : 'mind'}" aria-pressed="${all}" title="${all ? 'Minden ablak tabjai · kattintásra csak ez az ablak' : 'Ennek az ablaknak a tabjai · kattintásra minden ablak'}">${lineIcon(all ? 'square-stack' : 'app-window', 16)}</button>`
+      + `<button class="ib ${nf ? 'on' : ''}" data-menu="szuro" title="Szűrő">${lineIcon('list-filter', 16)}${nf ? `<small>${nf}</small>` : ''}</button>`
+      + `<button class="ib" data-menu="rendezes" title="Rendezés">${lineIcon('arrow-up-down', 16)}</button></div>`;
+  }
+  function filtHTML() { // a csoport a csoportsávon látszik, ha be van kapcsolva
+    const f = M.activeFilters().filter((x) => !(view.rail && x.op === 'group'));
+    if (!f.length) return '';
+    return `<div class="filt">Szűrve:${f.map((x) => `<span>${esc(x.label)}<button class="x" data-op="${x.op}" data-arg="${x.arg == null ? '' : x.arg}" title="Kikapcsolás">${lineIcon('x', 12)}</button></span>`).join('')}<button class="tb" data-op="clearFilters">Szűrők törlése</button></div>`;
+  }
+  function railHTML() {
+    if (!view.rail) return '';
+    return `<nav class="rail" aria-label="Csoportok">${M.groupOptions().map((g) => {
+      const on = st.group === g.key, arg = on && g.key !== 'mind' ? 'mind' : g.key;
+      return `<button class="ri ${on ? 'on' : ''}" data-op="group" data-arg="${arg}" aria-pressed="${on}" title="${esc(g.title)}: ${g.n} tab"><i class="${g.key === 'mind' ? 'all' : g.key === 'nincs' ? 'none' : ''}"${g.color ? ` style="background:${g.color}"` : ''}></i><span class="rn">${esc(g.title)}</span><span class="rc">${g.n}</span></button>`;
+    }).join('')}</nav>`;
+  }
+  function selHTML() {
+    if (!st.sel.size) return '';
+    return `<div class="selb"><span class="tx"><b>${st.sel.size}</b> kijelölve</span><button class="btn2" data-op="selClear">Mégse</button><button class="btn1" data-menu="rendezes">${lineIcon('arrow-up-down', 13)}Rendezés</button></div>`;
+  }
+  function noteHTML() { return st.note ? `<div class="note" role="status"><span class="tx">${esc(st.note.text)}</span><button class="ib sm" data-op="dismiss" title="Bezárás">${lineIcon('x', 14)}</button></div>` : ''; }
+  function bottomHTML() {
+    const j = M.job(), fut = j && j.state === 'fut', s = M.sum, sfut = s.state === 'fut';
+    const mods = SV.moduleOrder('b2').map((m) => {
+      let extra = '', tip = '';
+      if (m.id === 'felirat' && fut) { extra = `<span class="pct">${j.pct}%</span>`; tip = ' · ' + M.jobText(); }
+      if (m.id === 'osszefoglalo' && sfut) { extra = ring(s.total ? Math.round((s.words / s.total) * 100) : 0); tip = ' · ' + M.sumStateText(); }
+      return `<button class="mb" data-launch data-id="${m.id}" title="${esc(m.name)}${m.key ? ' · ' + m.key : ''}${tip}\nHúzd a sorrendhez">${lineIcon(m.icon, 16)}${extra}</button>`;
+    }).join('');
+    return `<div class="bottom"><div class="mods" data-launchers>${mods}</div><button class="mb" data-menu="tobb" title="Sűrűség, csoportsáv, gyorsgombok, videó zónái, beállítások">${lineIcon('ellipsis', 16)}</button></div>`;
+  }
+  function crumbs(title) {
+    return `<div class="bc"><button class="cr" data-op="back" title="Vissza a tabokhoz (Esc)">${lineIcon('arrow-left', 14)}Tabok</button><span>/</span><span class="cur">${title}</span><span class="sp"></span><span class="kbd">Esc</span></div>`;
+  }
+  function summaryHTML() {
+    const s = M.sum, fut = s.state === 'fut';
+    return crumbs('Összefoglaló') + `<div class="doc" data-list><h2>${esc(s.source)}</h2>
+      <div class="fields">${field(esc(s.kind), 'Forrás')}${field(esc(s.domain), 'Oldal')}${fut ? `<span class="run">${ring(s.total ? Math.round((s.words / s.total) * 100) : 0)}${M.sumStateText()}</span><button class="btn2" data-op="sumStop">Leállítás</button>` : ''}</div>
+      <ul>${M.sumItems().map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
+      ${s.state === 'leallitva' ? '<p class="mut">Leállítva. Az eddigi szöveg megmaradt.</p>' : ''}
+      ${s.qa.map((x) => `<div class="qa"><div class="q">${esc(x.q)}</div><p>${esc(x.a)}</p></div>`).join('')}</div>
+      <div class="ask"><div class="pr">${SV.prompts.map((p, i) => `<button class="btn2" data-op="prompt" data-arg="${i}">${esc(p)}</button>`).join('')}</div>
+        <div class="ar"><input data-ask placeholder="Kérdezz az oldalról" value="${esc(M.ui.askDraft || '')}"><button class="btn1" data-op="ask">Küldés</button></div></div>`;
+  }
+  function transcriptHTML() {
+    const j = M.job(), v = M.tab(M.VIDEO_TAB), fut = j && j.state === 'fut';
+    const stateH = fut ? `<span class="run">${ring(j.pct)}${M.jobText()}</span>` : !j ? '<span class="run">Még nincs felirat</span>' : j.state === 'megszakitva' ? `<span class="run">${M.jobText()}</span>` : '';
+    return crumbs('Átirat') + `<div class="doc" data-list><h2>${esc(v.title)}</h2>
+      <div class="fields">${field(esc(SV.domain(v.url)), 'Oldal')}${stateH}${M.transcriptActions().map((a) => `<button class="btn2" data-op="${a.op}" data-arg="${a.arg || ''}"${a.disabled ? ' disabled' : ''}${a.title ? ` title="${a.title}"` : ''}>${a.op === 'export' ? 'Mentés ' : ''}${a.label}</button>`).join('')}</div>
+      <table class="tr"><tbody>${M.segments().map(([t, x]) => `<tr data-op="seek" data-arg="${t}" title="Ugrás ide"><td class="ts">${fmt(t)}</td><td>${esc(x)}</td></tr>`).join('')}</tbody></table>
+      ${fut ? '<p class="mut">A többi rész átírás közben érkezik ide.</p>' : ''}</div>`;
+  }
+  function zoneGridHTML(key) {
+    const g = zones[key], rs = rowSizes(g);
+    let cells = '';
+    for (let r = 1; r <= g.rows; r++) for (let c = 1; c <= g.cols; c++) {
+      const cell = `${r}-${c}`, list = g.cells[cell] || [];
+      const lines = list.length ? list.map(([a, i]) => (key === 'gorgo' ? `<span class="za"><span>${i === 'fel' ? '↑' : '↓'}</span><span>${esc(ACTIONS[a].label)}</span></span>`
+        : `<span class="zb"><span>${esc(ACTIONS[a].label)}</span><span class="in">${esc(INPUTS[i])}</span></span>`)).join('') : '<span class="e">Nincs művelet</span>';
+      cells += `<button class="zc ${c === g.cols ? 'lc' : ''} ${r === g.rows ? 'lr' : ''}" data-menu="zona" data-menu-arg="${key}:${cell}" title="${g.title}, ${cellName(cell)}: műveletek">${lines}</button>`;
+    }
+    return `<div class="zs"><div class="zh"><span class="sh">${g.title}</span><span class="sp"></span><button class="btn2" data-menu="racs" data-menu-arg="${key}">Rács: ${g.rows} × ${g.cols}${lineIcon('chevron-down', 12)}</button></div>
+      <div class="zg" data-zones="${key}" style="grid-template-rows:${rs.map((x) => x + 'fr').join(' ')};grid-template-columns:repeat(${g.cols},minmax(0,1fr))">${cells}</div></div>`;
+  }
+  function zonesHTML() {
+    return crumbs('Videó zónái') + `<div class="doc" data-list><p class="mut">A videón ott fut a művelet, ahol a kurzor áll. Bemenetenként külön rács; egy zónára kattintva a műveletei.</p>${zoneGridHTML('gorgo')}${zoneGridHTML('gombok')}</div>`;
+  }
+  function draw() {
+    let inner;
+    if (st.view === 'osszefoglalo') inner = summaryHTML();
+    else if (st.view === 'atirat') inner = transcriptHTML();
+    else if (st.view === 'zonak') inner = zonesHTML();
+    else { const r = M.results(); inner = topHTML() + filtHTML() + `<div class="list" data-list>${r ? resultsHTML(r) : listHTML()}</div>` + selHTML(); }
+    return `<div class="b2 v-${st.view} dens-${st.density}" data-root>${railHTML()}<div class="main">${inner}${noteHTML()}</div>${bottomHTML()}</div>`;
+  }
+
+  // --- Menük: a közös menük mellett a „⋯”, a zóna és a rács menüje ----------------------------------------------
+  const menus = {
+    tobb: () => [
+      { t: 'head', label: 'Sűrűség' },
+      { t: 'radio', label: 'Kompakt', on: st.density === 'kompakt', op: 'density', arg: 'kompakt' },
+      { t: 'radio', label: 'Kényelmes', on: st.density === 'kenyelmes', op: 'density', arg: 'kenyelmes' },
+      { t: 'sep' },
+      { t: 'check', label: 'Csoportsáv', on: view.rail, op: 'rail' },
+      { t: 'head', label: 'Gyorsgombok a csoport fejlécén' },
+      ...QUICK.map(([k, l]) => ({ t: 'check', label: l, on: pref.quick.includes(k), op: 'quick', arg: k })),
+      { t: 'sep' },
+      { t: 'act', label: 'Videó zónái', op: 'zones' },
+      { t: 'act', label: 'Beállítások', op: 'settingsB2' },
+    ],
+    zona: (arg) => {
+      const [key, cell] = arg.split(':'), g = zones[key], list = g.cells[cell] || [];
+      return [{ t: 'head', label: `${g.title}: ${cellName(cell)}` },
+        ...list.map(([a, i], n) => ({ t: 'zact', label: ACTIONS[a].label, input: INPUTS[i], op: 'zoneDel', arg: `${arg}:${n}` })),
+        ...(list.length ? [] : [{ t: 'note', label: 'Ebben a zónában nincs művelet.' }]),
+        { t: 'sep' }, { t: 'act', icon: 'plus', label: 'Művelet', op: 'zoneAddMenu', arg }];
+    },
+    zonaUj: (arg) => {
+      const [key, cell] = arg.split(':'), g = zones[key], used = (g.cells[cell] || []).map(([, i]) => i);
+      const free = FREE[key].find((i) => !used.includes(i));
+      const back = [{ t: 'sep' }, { t: 'act', icon: 'arrow-left', label: 'Vissza', op: 'zoneBack', arg }];
+      if (!free) return [{ t: 'head', label: `Új művelet: ${g.title}, ${cellName(cell)}` }, { t: 'note', label: key === 'gorgo' ? 'A görgő mindkét iránya foglalt. Előbb törölj egy műveletet.' : 'Minden gomb foglalt. Előbb törölj egy műveletet.' }, ...back];
+      return [{ t: 'head', label: `Új művelet: ${g.title}, ${cellName(cell)}` }, { t: 'note', label: `Bemenet: ${INPUTS[free]}` },
+        ...KINDS[key].map((a) => ({ t: 'act', label: ACTIONS[a].label, op: 'zoneAdd', arg: `${arg}|${a}|${free}` })), ...back];
+    },
+    racs: (key) => [{ t: 'head', label: `${zones[key].title}: rács` },
+      ...GRIDS.map(([r, c]) => ({ t: 'radio', label: `${r} × ${c}`, on: zones[key].rows === r && zones[key].cols === c, op: 'zoneGrid', arg: `${key}|${r}|${c}` })),
+      { t: 'note', label: 'A műveletek zónánként megmaradnak; a rácsból kieső zónáké visszajön, ha újra nagyobb a rács.' }],
+  };
+  function menuHTML(kind, items) {
+    return `<div class="menu" data-menubox role="menu">${items.map((it) => {
+      if (it.t === 'head') return `<div class="mh">${esc(it.label)}</div>`;
+      if (it.t === 'sep') return '<div class="ms"></div>';
+      if (it.t === 'note') return `<div class="mnote">${esc(it.label)}</div>`;
+      if (it.t === 'price') return `<label class="mp">${it.label}<input data-price inputmode="numeric" value="${it.value == null ? '' : it.value}" placeholder="pl. 20000">Ft</label>`;
+      if (it.t === 'zact') return `<div class="mz"><span class="zl">${esc(it.label)}</span><span class="chip">${esc(it.input)}<button data-op="${it.op}" data-arg="${it.arg}" title="Művelet törlése">${lineIcon('x', 12)}</button></span></div>`;
+      let ck = '';
+      if (it.t === 'check') ck = `<span class="ck">${lineIcon(it.on ? 'square-check' : 'square', 14)}</span>`;
+      else if (it.t === 'radio') ck = `<span class="ck">${it.on ? lineIcon('check', 14) : ''}</span>`;
+      else if (it.icon) ck = `<span class="ck">${lineIcon(it.icon, 14)}</span>`;
+      return `<button class="mi ${it.on ? 'on' : ''}" role="${it.t === 'act' ? 'menuitem' : it.t === 'radio' ? 'menuitemradio' : 'menuitemcheckbox'}"${it.t !== 'act' ? ` aria-checked="${!!it.on}"` : ''} data-op="${it.op}" data-arg="${it.arg == null ? '' : it.arg}" ${it.disabled ? 'disabled' : ''}>${ck}${it.color ? `<i style="background:${it.color}"></i>` : ''}${esc(it.label)}${it.n != null ? `<span class="n">${it.n}</span>` : ''}</button>`;
+    }).join('')}</div>`;
+  }
+  // Az irány saját műveletei (a közös modul hívja, ha nem ismeri a nevet).
+  function op(name, arg) {
+    switch (name) {
+      case 'rail': view.rail = !view.rail; pref.rail = view.rail; save('sv-b2-sav', view.rail ? '1' : '0'); return true;
+      case 'quick': {
+        const on = new Set(pref.quick); if (on.has(arg)) on.delete(arg); else on.add(arg);
+        pref.quick = QUICK.map(([k]) => k).filter((k) => on.has(k)); save('sv-b2-gyors', pref.quick.join(',')); return true;
+      }
+      case 'zones': st.view = 'zonak'; st.menu = null; return true;
+      case 'settingsB2': M.note('A prototípusban nincs: modulok, altatási idő, kivétellista, mentett promptok.'); st.menu = null; return true;
+      case 'clearQ': st.q = ''; M.ui.focusSearch = true; return true;
+      case 'zoneDel': {
+        const [key, cell, n] = String(arg).split(':'), list = zones[key].cells[cell], [a, i] = list[+n];
+        list.splice(+n, 1); M.note(`Törölve: ${ACTIONS[a].label} (${INPUTS[i]}), ${zones[key].title}, ${cellName(cell)}.`); return true;
+      }
+      case 'zoneAddMenu': st.menu = Object.assign({}, st.menu, { kind: 'zonaUj' }); return true;
+      case 'zoneBack': st.menu = Object.assign({}, st.menu, { kind: 'zona' }); return true;
+      case 'zoneAdd': {
+        const [where, a, i] = String(arg).split('|'), [key, cell] = where.split(':'), g = zones[key];
+        (g.cells[cell] = g.cells[cell] || []).push([a, i]);
+        st.menu = Object.assign({}, st.menu, { kind: 'zona', arg: where });
+        M.note(`Hozzáadva: ${ACTIONS[a].label} (${INPUTS[i]}), ${g.title}, ${cellName(cell)}.`); return true;
+      }
+      case 'zoneGrid': { const [key, r, c] = String(arg).split('|'); zones[key].rows = +r; zones[key].cols = +c; return true; }
+    }
+    return false;
+  }
+
+  // --- A videón: középen a visszajelzés, gomb nélkül (VD7 a Video Dominator Action Info-ja szerint) -----------------
+  function hudHTML(m) {
+    const kind = m.kind || { bal: 'vol', jobb: 'seek', kozep: 'play' }[m.ev];
+    if (!m.ev || !kind) return '';
+    const t = kind === 'vol' ? `Hangerő ${m.vol}%` : kind === 'seek' ? `${osdTime(m.t)} / ${osdTime(m.dur)}`
+      : kind === 'speed' ? `Sebesség ${M.speedText(m.speed)}` : m.playing ? 'Lejátszás' : 'Szünet';
+    return `<div class="osd" role="status">${t}</div>`;
+  }
+  // Saját lejátszó (VD8): ablakban (az oldal helyén) vagy teljes képernyőn; csak a videó és a folyamatsáv.
+  function playerHTML(kind) {
+    const v = Keret.video;
+    return `<div class="player ${kind === 'teljes' ? 'full' : ''}" data-player="${kind}">
+      <div class="video" data-video>${Keret.slideHTML()}<span class="ph">saját lejátszó (${kind === 'teljes' ? 'teljes képernyő' : 'ablak'}) · videókép: kódban rajzolt helykitöltő · bezárás: Esc vagy Alt + középső gomb</span>
+        <div class="seek" data-seek><div class="trk"><b style="width:${(v.t / v.dur) * 100}%"></b><u hidden></u></div>
+          <div class="prev" hidden><div class="pimg">${Keret.slideHTML()}</div><span class="plabel"></span></div></div>
+        <div data-hud></div></div></div>`;
+  }
+  const playerOpen = () => !!document.querySelector('[data-player]');
+  function player(kind) {
+    if (playerOpen()) Keret.setPage(null); else Keret.setPage(playerHTML(kind));
+  }
+  let actTimer = null;
+  function sync(v) { // a sáv kitöltése; művelet után kb. 2 mp-ig vastagabb (VD „Activity Timeout 2s”)
+    const b = document.querySelector('[data-player] .trk b'); if (!b) return;
+    b.style.width = (v.t / v.dur) * 100 + '%';
+    const sk = b.closest('[data-seek]'); sk.classList.add('act');
+    clearTimeout(actTimer); actTimer = setTimeout(() => sk.classList.remove('act'), 2000);
+  }
+  function bindVideo(el) {
+    const sk = el.querySelector('[data-seek]'); if (!sk) return;
+    const bar = sk.querySelector('.trk'), mark = bar.querySelector('u'), prev = sk.querySelector('.prev');
+    const frac = (e) => { const r = bar.getBoundingClientRect(); return Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)); };
+    sk.addEventListener('mousemove', (e) => {
+      const f = frac(e), sr = sk.getBoundingClientRect(), vr = el.getBoundingClientRect();
+      sk.classList.add('hover');
+      mark.hidden = false; mark.style.left = f * 100 + '%';
+      prev.hidden = false;
+      prev.querySelector('.plabel').textContent = osdTime(f * Keret.video.dur);
+      const x = Math.max(vr.left + 8, Math.min(vr.right - 168, e.clientX - 80));
+      prev.style.left = x - sr.left + 'px';
+      const sl = prev.querySelector('.slide'), s = 160 / el.clientWidth; // az előnézet a videókép kicsinyítve
+      Object.assign(sl.style, { width: el.clientWidth + 'px', height: el.clientHeight + 'px', transform: `scale(${s})` });
+    });
+    sk.addEventListener('mouseleave', () => { sk.classList.remove('hover'); mark.hidden = true; prev.hidden = true; });
+    sk.addEventListener('mousedown', (e) => { if (e.button !== 0) return; e.preventDefault(); Keret.seek(frac(e) * Keret.video.dur); });
+  }
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && playerOpen() && !st.menu) Keret.setPage(null); });
+
+  // A prototípus saját állapotai: a csoportsáv bekapcsolva; a saját lejátszó, mellette a panelben a zónák.
+  function setup(state) {
+    view.rail = state === 'csoportsav' ? true : pref.rail;
+    if (state === 'lejatszo') { SV.tabs.forEach((t) => { t.active = t.id === M.VIDEO_TAB; }); st.view = 'zonak'; }
+  }
+  const pageHTML = (state) => (state === 'lejatszo' ? playerHTML('ablak') : null);
+
+  Keret.init({ key: 'b2', title: 'B, változtatásokkal', badge: { bg: '#2b2b2b', fg: '#ffffff' }, draw, menuHTML, hudHTML,
+    menus, op, keepOpen: ['tobb', 'zona', 'zonaUj'], liveLaunchers: true,
+    extraStates: [['csoportsav', 'Csoportsáv'], ['lejatszo', 'Lejátszó']], setup, pageHTML, sync, bindVideo, zoneAction, player });
+})();
+</script>
+</body>
+</html>

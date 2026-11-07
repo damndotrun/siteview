@@ -23,14 +23,18 @@ window.Keret = (function () {
     const body = t.text ? SV.mark(t.text, q || '', 'find') : '';
     return `<div class="article"><div class="crumbs">${SV.esc(SV.domain(t.url))}</div><h1>${SV.esc(t.title)}</h1><p>${body}</p></div>`;
   }
-  function videoPage() {
-    return `<div class="vpage">
-      <div class="video" data-video>
-        <div class="slide"><h2>One hour of English audio, laptop CPU</h2>
+  // A videókép: egy képernyőfelvétel diája, kódban rajzolva (a saját lejátszó és az előnézet is ezt mutatja).
+  function slideHTML() {
+    return `<div class="slide"><h2>One hour of English audio, laptop CPU</h2>
           <div class="bar"><span>openai-whisper (small.en)</span><i class="slow" style="width:58%"></i><span>58 min</span></div>
           <div class="bar"><span>faster-whisper fp32</span><i style="width:16%"></i><span>16 min</span></div>
           <div class="bar"><span>faster-whisper int8 + VAD</span><i style="width:5%"></i><span>5 min</span></div>
-          <div class="note">Intel i5-1240P · 4 threads · beam size 5</div></div>
+          <div class="note">Intel i5-1240P · 4 threads · beam size 5</div></div>`;
+  }
+  function videoPage() {
+    return `<div class="vpage">
+      <div class="video" data-video>
+        ${slideHTML()}
         <span class="ph">videókép: kódban rajzolt helykitöltő</span>
         <div class="native"><span>${video.playing ? '❚❚' : '▶'}</span><div class="track"><b style="width:${(video.t / video.dur) * 100}%"></b></div><span>${fmt(video.t)} / ${fmt(video.dur)}</span></div>
         <div data-hud></div>
@@ -39,19 +43,24 @@ window.Keret = (function () {
       <div class="ch">Local AI Lab · 48 ezer megtekintés · 3 hete</div></div>`;
   }
 
-  function current() { const h = location.hash.slice(1); return STATES.some(([k]) => k === h) ? h : 'lista'; }
+  // Az irány saját állapotai (pl. a választott B csoportsávja, saját lejátszója) a közösek után jönnek.
+  const allStates = () => STATES.concat((dir && dir.extraStates) || []);
+  function current() { const h = location.hash.slice(1); return allStates().some(([k]) => k === h) ? h : 'lista'; }
 
   function render() {
     const state = current();
     Object.assign(video, { vol: 65, t: 724, speed: 1.5, playing: true });
     hudEv = null; clearTimeout(hideTimer);
     M.setup(state);
+    if (dir.setup) dir.setup(state);
     const a = M.active();
     document.querySelector('.url').textContent = a.url;
     document.querySelectorAll('.proto a[href^="#"]').forEach((x) => x.classList.toggle('on', x.getAttribute('href') === '#' + state));
     const page = document.querySelector('.page');
-    page.innerHTML = a.id === M.VIDEO_TAB ? videoPage() : articlePage();
-    if (a.id === M.VIDEO_TAB) bindVideo(page.querySelector('[data-video]'));
+    const own = dir.pageHTML ? dir.pageHTML(state) : null; // az irány saját oldala (pl. saját lejátszó, VD8)
+    page.innerHTML = own != null ? own : a.id === M.VIDEO_TAB ? videoPage() : articlePage();
+    const vEl = page.querySelector('[data-video]');
+    if (vEl) bindVideo(vEl);
     M.mount(dir, document.querySelector('.panel-body'));
   }
   // Az ikon jelvénye (SG6): az irány adja a színt, a szöveg a felirat állapota.
@@ -78,6 +87,7 @@ window.Keret = (function () {
 
   function sync() {
     const el = document.querySelector('[data-video]'); if (!el) return;
+    if (dir.sync) dir.sync(video);
     const b = el.querySelector('.native b'); if (b) b.style.width = (video.t / video.dur) * 100 + '%';
     const tt = el.querySelector('.native span:last-child'); if (tt) tt.textContent = `${fmt(video.t)} / ${fmt(video.dur)}`;
     const pp = el.querySelector('.native span:first-child'); if (pp) pp.textContent = video.playing ? '❚❚' : '▶';
@@ -107,12 +117,34 @@ window.Keret = (function () {
     if (hud && hud.matches(':hover')) { hideTimer = setTimeout(hideLater, 600); return; }
     hudEv = null; paintHud();
   }
+  // Zónás irány (VD2 a Video Dominator mintájára): az irány megmondja, a kurzor helyén mit csinál a bemenet.
+  const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+  function apply(z) {
+    if (z.vol != null) video.vol = clamp(video.vol + z.vol, 0, 100);
+    if (z.seek != null) video.t = clamp(video.t + z.seek, 0, video.dur);
+    if (z.seekPct != null) video.t = clamp(video.t + video.dur * z.seekPct / 100, 0, video.dur);
+    if (z.speed != null) video.speed = clamp(Math.round((video.speed + z.speed) * 100) / 100, 0.07, 16);
+    if (z.speedSet != null) video.speed = z.speedSet;
+    if (z.play) video.playing = !video.playing;
+    sync(); refreshSub();
+    if (z.player && dir.player) return dir.player(z.player);
+    showHud({ side: z.side, kind: z.kind, step: z.step || 0 });
+  }
+  function zoneAt(el, e, input, step) {
+    if (!dir.zoneAction) return null;
+    const r = el.getBoundingClientRect();
+    return dir.zoneAction(input, (e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height, step);
+  }
   function bindVideo(el) {
     const hud = el.querySelector('[data-hud]');
     hud.addEventListener('click', (e) => { const b = e.target.closest('[data-op]'); if (b) { e.stopPropagation(); M.op(b.dataset.op, b.dataset.arg); } });
+    if (dir.bindVideo) dir.bindVideo(el);
     el.addEventListener('wheel', (e) => {
       if (e.target.closest('[data-hud] button')) return;
       e.preventDefault();
+      const z = zoneAt(el, e, 'gorgo', e.deltaY < 0 ? 1 : -1);
+      if (z) return apply(z);
+      if (dir.zoneAction) return; // zónás iránynál a zóna nélküli hely nem csinál semmit
       const r = el.getBoundingClientRect();
       const side = e.clientX - r.left < r.width / 2 ? 'bal' : 'jobb';
       const step = e.deltaY < 0 ? 1 : -1;
@@ -122,6 +154,12 @@ window.Keret = (function () {
       showHud({ side, step });
     }, { passive: false });
     el.addEventListener('mousedown', (e) => {
+      if (dir.zoneAction) {
+        if (e.target.closest('[data-hud] [data-op], [data-seek]')) return; // a saját lejátszó sávja nem zóna
+        const z = zoneAt(el, e, (e.altKey ? 'alt-' : '') + ['bal', 'kozep', 'jobb'][e.button], 0);
+        if (z) { e.preventDefault(); apply(z); }
+        return;
+      }
       if (e.button !== 1) return; // középső gomb = lejátszás/szünet
       e.preventDefault(); video.playing = !video.playing; sync();
       showHud({ side: 'kozep' });
@@ -135,7 +173,7 @@ window.Keret = (function () {
     document.body.innerHTML = `<div class="browser">
       <div class="topbar"><div class="url"></div>
         <span class="ext" title="A Siteview ikonja a Chrome eszköztárán, jelvénnyel (SG6)"><span class="ext-ico"></span><span class="ext-badge" hidden></span></span>
-        <nav class="proto" aria-label="Prototípus állapotai">${location.protocol === 'file:' ? '' : '<a class="home" href="../index.html">← Áttekintés</a>'}<span>${SV.esc(direction.title)}:</span>${STATES.map(([k, l]) => `<a href="#${k}">${l}</a>`).join('')}</nav></div>
+        <nav class="proto" aria-label="Prototípus állapotai">${location.protocol === 'file:' ? '' : '<a class="home" href="../index.html">← Áttekintés</a>'}<span>${SV.esc(direction.title)}:</span>${allStates().map(([k, l]) => `<a href="#${k}">${l}</a>`).join('')}</nav></div>
       <main class="page"></main>
       <aside class="panel-host" aria-label="Siteview oldalpanel">
         <div class="cp-head" title="A Chrome oldalpanel saját fejléce (nem a Siteview része)"><span class="cp-ico"></span>Siteview<span class="cp-caret">▾</span><span class="cp-sp"></span><span class="cp-btn">${lineIcon('pin', 14)}</span><span class="cp-btn">${lineIcon('x', 14)}</span></div>
@@ -144,6 +182,14 @@ window.Keret = (function () {
     window.addEventListener('hashchange', render);
     render();
   }
+  // Az oldal cseréje állapotváltás nélkül (a saját lejátszó megnyitása és bezárása, VD8); null: az aktív tab oldala.
+  function setPage(html) {
+    const page = document.querySelector('.page');
+    hudEv = null; clearTimeout(hideTimer);
+    page.innerHTML = html != null ? html : M.active().id === M.VIDEO_TAB ? videoPage() : articlePage();
+    const vEl = page.querySelector('[data-video]');
+    if (vEl) bindVideo(vEl);
+  }
   // Teszteléshez: egy HUD-állapot rögzítése képernyőképhez, és az időzítők megállítása.
   function freezeHud(side) {
     M.freeze();
@@ -151,5 +197,5 @@ window.Keret = (function () {
     sync(); refreshSub();
     showHud({ side, step: 1, frozen: true });
   }
-  return { init, video, fmt, freezeHud, openTab, setBadge, current, seek, refreshSub, paintHud, rerender: render, go: (s) => { location.hash = s; } };
+  return { init, video, fmt, freezeHud, openTab, setBadge, current, seek, refreshSub, paintHud, showHud, slideHTML, setPage, rerender: render, go: (s) => { location.hash = s; } };
 })();

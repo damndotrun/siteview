@@ -238,6 +238,33 @@ window.M = (function () {
     note(`Új csoport: ${d}, ${same.length} tab.`);
   }
 
+  // Egy csoport műveletei (a választott B csoportfejlécének gyorsgombjai; az A, B, C nem hívja őket).
+  // Az altatás az ATD4 kivételeivel; a mentés a TS3 munkamenete; az áthelyezés a böngészőben chrome.tabs.move.
+  function groupTabs(gid) { const [w, k] = String(gid).split(':'); return T.filter((t) => t.win === +w && gkey(t) === k); }
+  const gtitle = (gid) => ginfo(String(gid).split(':')[1]).title;
+  function sleepGroup(gid) {
+    const all = groupTabs(gid), list = all.filter(sleepable), skip = all.filter((t) => !t.discarded && !sleepable(t)).length;
+    list.forEach((t) => { t.discarded = true; });
+    note(list.length ? `Altatva a „${gtitle(gid)}” csoportból: ${list.length} tab.${skip ? ` Kivétel: ${skip} (aktív, rögzített, hangot ad vagy „ne altasd”).` : ''}`
+      : `A „${gtitle(gid)}” csoportban nincs altatható tab.`);
+  }
+  function saveGroup(gid) { note(`Munkamenetként mentve: „${gtitle(gid)}”, ${groupTabs(gid).length} tab.`); }
+  function moveGroup(arg) {
+    const [gid, to] = String(arg).split('|');
+    const list = groupTabs(gid);
+    if (!list.length) return;
+    const target = to === 'uj' ? Math.max(...T.map((t) => t.win)) + 1 : +to;
+    const a = active();
+    if (list.includes(a)) switchAway(a);
+    list.forEach((t) => T.splice(T.indexOf(t), 1));
+    let at = -1; T.forEach((t, i) => { if (t.win === target) at = i; });
+    if (at < 0) at = T.length - 1;
+    T.splice(at + 1, 0, ...list);
+    list.forEach((t) => { t.win = target; t.active = false; });
+    st.collapsed.delete(gid);
+    note(`Áthelyezve: „${gtitle(gid)}”, ${list.length} tab → ${to === 'uj' ? `új ablak (${target}. ablak)` : target === CUR ? 'ez az ablak' : `${target}. ablak`}.`);
+  }
+
   // --- Megnyitás és modulindítók ------------------------------------------------------------------------------
   function openTab(id) {
     const t = tab(id);
@@ -272,7 +299,7 @@ window.M = (function () {
       if (frozen || sum.state !== 'fut') return;
       sum.words = Math.min(sum.total, sum.words + 2);
       if (sum.words >= sum.total) { sum.state = 'kesz'; clearInterval(sumTimer); }
-      if (st.view === 'osszefoglalo') render();
+      if (st.view === 'osszefoglalo' || (dir && dir.liveLaunchers)) render(); // a választott B az indítón is mutatja
     }, 160);
   }
   function sumItems() {
@@ -330,7 +357,7 @@ window.M = (function () {
   // A HUD tartalma (VD2 alap, VD7): mindhárom irány ugyanezt mutatja, csak máshol és másképp.
   function hudModel(v, ev) {
     const j = job && job.tab === VIDEO_TAB ? job : null;
-    return { ev: ev ? ev.side : null, step: ev ? ev.step : 0, vol: v.vol, t: v.t, dur: v.dur, speed: v.speed, playing: v.playing,
+    return { ev: ev ? ev.side : null, kind: ev && ev.kind ? ev.kind : null, step: ev ? ev.step : 0, vol: v.vol, t: v.t, dur: v.dur, speed: v.speed, playing: v.playing,
       job: j && j.state === 'fut' ? { step: j.step, pct: j.pct } : null,
       offer: !!ev && !(j && (j.state === 'fut' || j.state === 'kesz')) }; // „Felirat” gomb, ha még nincs felirat
   }
@@ -408,6 +435,12 @@ window.M = (function () {
       { t: 'radio', label: 'Ez az ablak', on: st.win === 'ez', op: 'win', arg: 'ez' },
       { t: 'radio', label: 'Minden ablak', on: st.win === 'mind', op: 'win', arg: 'mind' },
     ],
+    mozgatas: (gid) => {
+      const w = +String(gid).split(':')[0];
+      const wins = [...new Set(T.map((t) => t.win))].filter((x) => x !== w).sort();
+      return [{ t: 'head', label: `Áthelyezés: ${gtitle(gid)}` }, { t: 'act', label: 'Új ablakba', op: 'moveGroup', arg: `${gid}|uj` },
+        ...wins.map((x) => ({ t: 'act', label: x === CUR ? 'Ebbe az ablakba' : `A ${x}. ablakba`, op: 'moveGroup', arg: `${gid}|${x}` }))];
+    },
     csoport: () => groupOptions().map((g) => ({ t: 'radio', label: g.title, color: g.color, n: g.n, on: st.group === g.key, op: 'group', arg: g.key })),
     tobb: () => [
       { t: 'head', label: 'Sűrűség' },
@@ -463,10 +496,13 @@ window.M = (function () {
       case 'seek': Keret.seek(+arg); break;
       case 'search': ui.searchOpen = true; ui.focusSearch = true; break;
       case 'closeSearch': ui.searchOpen = false; st.q = ''; break;
-      default: return;
+      case 'sleepGroup': sleepGroup(arg); break;
+      case 'saveGroup': saveGroup(arg); break;
+      case 'moveGroup': moveGroup(arg); break;
+      default: if (!dir || !dir.op || !dir.op(name, arg, el)) return; // az irány saját műveletei (pl. csoportsáv)
     }
     // A Szűrő menü nyitva marad (több kapcsoló egymás után), a többi menü a választás után bezárul.
-    if (fromMenu && !(st.menu && st.menu.kind === 'szuro')) st.menu = null;
+    if (fromMenu && !(st.menu && (st.menu.kind === 'szuro' || (dir && dir.keepOpen && dir.keepOpen.includes(st.menu.kind))))) st.menu = null;
     render();
   }
 
@@ -487,7 +523,8 @@ window.M = (function () {
     host.innerHTML = dir.draw();
     if (st.menu) {
       const root = host.querySelector('[data-root]');
-      root.insertAdjacentHTML('beforeend', dir.menuHTML(st.menu.kind, menus[st.menu.kind](st.menu.arg)));
+      const mk = (dir.menus && dir.menus[st.menu.kind]) || menus[st.menu.kind]; // az irány felülírhat egy közös menüt
+      root.insertAdjacentHTML('beforeend', dir.menuHTML(st.menu.kind, mk(st.menu.arg)));
       place();
     }
     const box = host.querySelector('[data-launchers]');
@@ -543,11 +580,11 @@ window.M = (function () {
     let closed = false;
     if (st.menu && !inMenu && !(opener && opener.dataset.menu === st.menu.kind) && !e.target.closest('[data-launch][data-id="altatas"]')) { st.menu = null; closed = true; }
     if (opener) {
-      const kind = opener.dataset.menu;
-      if (st.menu && st.menu.kind === kind) st.menu = null;
+      const kind = opener.dataset.menu, arg = opener.dataset.menuArg;
+      if (st.menu && st.menu.kind === kind && st.menu.arg === arg) st.menu = null;
       else {
-        const sel = `[data-menu="${kind}"]`;
-        st.menu = { kind, anchor: sel, index: [...host.querySelectorAll(sel)].indexOf(opener) };
+        const sel = arg != null ? `[data-menu="${kind}"][data-menu-arg="${arg}"]` : `[data-menu="${kind}"]`;
+        st.menu = { kind, arg, anchor: sel, index: [...host.querySelectorAll(sel)].indexOf(opener) };
       }
       return render();
     }
@@ -658,6 +695,6 @@ window.M = (function () {
     st, ui, sum, menus, SORTS, CUR, VIDEO_TAB,
     tab, active, sections, groupOptions, activeFilters, results, countLine, otherHint, empty, emptyList, WHY, scopeText,
     states, price, short, sumItems, sumStateText, segments, subLine, jobText, job: () => job, badge, hudModel, speedText, hudText, transcriptActions,
-    op, render, mount, setup, freeze: () => { frozen = true; },
+    op, render, mount, setup, note, freeze: () => { frozen = true; },
   };
 })();

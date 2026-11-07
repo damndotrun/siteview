@@ -1,6 +1,8 @@
 Tömörítés után: töltsd be újra a `dizajnkutatas` és a `refero-design` skillt, olvasd el az `anti-ai-slop.md`-t és ennek a fájlnak a sablonellenőrzését, mielőtt tervezel.
 # Vizuális irány: Siteview
-Állapot: javaslat (2. kör) · Spec: specs/siteview/SPEC.md v1 · Előző kör: `vizualis-irany-elvetve-1.md`
+Állapot: javaslat (2. kör), választva 2026-11-07: B a kommentek szerinti változtatásokkal (a változtatott prototípus
+kész és bejárva; „elfogadva” Karesz igenje és a sötét mód tokenjei után) · Spec: specs/siteview/SPEC.md v1 · Előző
+kör: `vizualis-irany-elvetve-1.md`
 
 ## Kulcskérdés és szempontok
 Forrás: `munkafolyamat.md`. Kulcskérdés: hogyan lehet sok háttérben nyitott oldal címe, helye és állapota egy
@@ -20,6 +22,39 @@ böngészőben is” lépés), és mindhárom irány a spec funkcióinak csak eg
 C-ben, a többes kijelölés csak a B-ben, a csoportok összecsukása csak az A-ban). Az alapok, a vonások és a kinézet
 nem kaptak kifogást, ezek maradtak; a nyitott döntési kérdés lezárult („Egyik sem, vagy változtatással”).
 
+Kötött (Karesz, 2026-11-07, 21 komment a javított 2. kör áttekintőjén; a döntési kártyát „Egyik sem, vagy
+változtatással” válasszal zártam, mert a kommentek a B-t választják, változtatásokkal):
+- Alap a B listája: „ezt az B nézetet szeretném” (egysoros sorok).
+- Felül: „ezeket vegyük ki innen [a csoportfüleket], és a helyét töltse ki a kereső mező alapértelmezetten, ne csak
+  kattintásra”; az „Ez az ablak” „tegyük fel a kereső-szűrő-rendező csoport mellé toggle ikonként. az itt lent maradó
+  ikonok pedig szerintem töltsék ki ezt a részt is”.
+- Bal oldali sáv: „opcionálisan ezt a sávot [az A ikonoszlopát] kapcsolhatnánk a B változatnál, csak az ikonok
+  helyett megjelenhetnének itt a tab csoportok valamilyen formában”.
+- Betű: „lehet hogy csak a betű méretével esetleg font typeal van bajom, mert az A és C változatok jelentősen jobban
+  néznek ki”.
+- Csoportfejléc: „az C csoportfelirat dizájnját szeretném, a bal szélen lévő > ikonnal”; „a jobb szélére pedig
+  szeretnék opcionális gyors gombokat pl: csoport altatása, mentése, áthelyezése”.
+- Keresés: „2 találat · …” és „A 2. ablakban még 2 találat”: „nagyon beleolvad”; „Nincs találat”: „hasonló
+  formázást szeretnék [mint a C-ben]”.
+- Menük: „ilyen panelt szeretnék a B változatnál is. sokkal jobban áttekinthető pusztán azért mert látszódnak az
+  elválasztók, és a checkbox is hasonló ahhoz, mint amikor kijelöljük a tabokat”; a C Rendezés menüje „is jobban
+  áttekinthető”.
+- Kijelölés: a C alsó sávja („4 kijelölve · Mégse · Rendezés”): „ilyet szeretnék a B változathoz is, és akkor fent
+  meg tud maradni a kereső sáv”.
+- Visszajelzés: a C százaléka a Felirat indítóján: „ilyen töltés jelzőt szeretnék a B változathoz is”; „A felirat
+  elkészült.”: „a C-nek ezek a visszajelző dolgai sokkal jobban sikerültek mint az A és B”; az összefoglaló „kész”
+  pecsétje helyett „valamilyen töltés jelzőt … ameddig nincs kész, és utána akár el is tűnhet”, „lehetne az alul lévő
+  ikonon is a visszajelzés, mint a felirat készítés esetében”.
+- Összefoglaló és átirat: a C-é („itt is az áttekinthetőség nyer”, „az átiratnál … is ez a C változat a nyerő”); a
+  fenti prompt mező „nem kell ide … mert alul is megjelenik ugyan ez”; az alsó kérdéssor: „ez is mehet akkor”.
+- Videó: a felirat állapota a videón helyett „akár az extension ikonján is látszódhatna a töltés”; „a lejátszót még
+  át kell gondolnunk, szeretnék a dominatorhoz hasonló zónázási lehetőséget”, „a visszajelzéseket is átgondoljuk
+  még”, „elég a videó alján egy állítható vastagságú (default/action) seekbar … a seekbaron jó lenne egy előnézet is
+  hover esetén” (külön lépés; a Video Dominator képei kellenek).
+Ami ezzel megbukott: a B felső sávja (csoportfülek, rejtett kereső), a betűi (vékony 16 px-es fejléc, közepes súlyú
+sorok sok halványszürkével), a menüi, a kijelölési sávja, az értesítései és az összefoglaló, átirat nézete. Ami marad:
+az egysoros, sűrű lista, a kurzor sora, a rámutatásra megjelenő sorműveletek és a jelölőnégyzetes kijelölés.
+
 ## Lekérdezésnapló
 | # | Lekérdezés (szó szerint) | Eszköz | Mire szól | Megnyitott találatok |
 | --- | --- | --- | --- | --- |
@@ -35,15 +70,17 @@ nem kaptak kifogást, ezek maradtak; a nyitott döntési kérdés lezárult („
 | 10 | video player with volume level overlay on the video | Mobbin `search_screens` (web, deep) | K2 kezelési probléma | Prime Video, Arcade, Whereby, Contra, Synthesia, The Leap, SuperHi |
 | 11 | table of saved products with a price column sorted by price | Mobbin `search_screens` (web, deep) | K1/6. lépés: rendezés mező szerint, csoporton belül | Programa, Fresha, QuickBooks, Wix, Midday, HubSpot, Patreon, Amazon, Binance, Square |
 | 12 | generating a transcript for an uploaded video with progress | Mobbin `search_flows` (web) | K3 lépéssor | Fireflies „Uploading a file”, Matter „Requesting video transcript”, ElevenLabs „Transcribing a file”, Dovetail „Transcribing a video” |
+| 13 | collapsed sidebar rail showing only icons for switching between saved views of a list | Mobbin `search_screens` (web, deep) | a csoportsáv (Karesz kommentje a választás után) | Linear, Gorgias, Aboard, Plain, Canny, Mindtrip, Jira, Turo, KAYAK, Pipedrive, StackAI, Pinterest (előnézet); mentve: Turo, Plain |
 
 Keret: 12 lekérdezés, 15 mentett kép, 4 lépéssor. A Mobbin képei csak előnézeti méretben (768 px) érhetők el innen, a
 `mobbin.com` letöltést a hálózat tiltja; a vonásokat ezekről olvastam, a színeket pixelmintával. A funkció és a kinézet
-szétválasztásához nem kellett új lekérdezés: az új részleteket a már mentett képekről olvastam ki.
+szétválasztásához nem kellett új lekérdezés: az új részleteket a már mentett képekről olvastam ki. A választás után
+egy lekérdezés (13.) a csoportsávhoz, és Karesz nyolc képe a Video Dominatorról (nem lekérdezés, lásd Referencianapló).
 
 ## Referencianapló (Menet 1.)
 | Termék | Kép | Szerep | Indok |
 | --- | --- | --- | --- |
-| Video Dominator | nem néztem meg | nem vizsgált: nincs a Refero és a Mobbin könyvtárában, a webáruház innen nem érhető el | – |
+| Video Dominator | Karesz képernyőképei, 2026-11-07: `refs/vd-lejatszo-sav.jpg`, `refs/vd-lejatszo-ido.jpg` (saját lejátszó), `refs/vd-zonak-gorgo.jpg`, `refs/vd-zonak-egergombok.jpg`, `refs/vd-zona-szerkesztese.jpg` (zónák), `refs/vd-beallitasok-vezerles.jpg`, `refs/vd-beallitasok-visszajelzes.jpg`, `refs/vd-beallitasok-sav.jpg` (beállítások) | alap termék: a videó (saját lejátszó, visszajelzés, zónák) | Karesz: „szeretnék a dominatorhoz hasonló zónázási lehetőséget”, „elég a videó alján egy állítható vastagságú (default/action) seekbar”; a Refero és a Mobbin könyvtárában nincs, a webáruház innen nem érhető el |
 | Auto Tab Discard | nem néztem meg | nem vizsgált: mint fent | – |
 | Tab Shelf | nem néztem meg | nem vizsgált: mint fent | – |
 | Duplicate Tabs Preventor | nem néztem meg | nem vizsgált: mint fent | – |
@@ -63,6 +100,8 @@ szétválasztásához nem kellett új lekérdezés: az új részleteket a már m
 | The Leap | `refs/the-leap-felirat.jpg` ([Mobbin](https://mobbin.com/screens/d86f77bd-1812-4d7d-a7e7-cfe172b2c63a)) | elvetve | szavanként kiemelt felirat; Karesz kérése a sima felirat, és a zöldessárga más szerepű, mint bármelyik alapnál |
 | Substack, The New York Times, mymind, Hashnode | `refs/substack-mentett.jpg`, `refs/nyt-olvasasi-lista.jpg`, `refs/mymind.jpg`, `refs/hashnode-konyvjelzok.jpg` | elvetve | mentett cikkek nagy képpel vagy kártyával; a tabokhoz nincs kép, a kártya csak helyet vesz el |
 | Midday | `refs/midday-termekek.jpg` ([Mobbin](https://mobbin.com/screens/667e0990-d6d7-40d3-af9e-8c8ae8e744d2)) | elvetve | termékár-táblázat, de a szakaszon belüli rendezést a Programa mutatja |
+| Turo | `refs/turo-ikonsav.jpg` ([Mobbin](https://mobbin.com/screens/981f11b2-a21e-4427-9aa7-e420343c0935)) | részlet: csoportsáv (választott irány) | keskeny sáv, ikon alatt rövid felirat; Karesz: „ezt a sávot kapcsolhatnánk” |
+| Plain | `refs/plain-nezetek.jpg` ([Mobbin](https://mobbin.com/screens/68105be8-1702-497f-916a-aa9efa192a95)) | elvetve | a nézetek listája (név, darabszám) egy széles második oszlop; a 320 px-es panelben a lista mellett nem fér el, ezért a Turo keskeny sávja maradt |
 
 A terület saját termékei (tabkezelők, böngészők) nincsenek a könyvtárakban; mindhárom alap másik terület terméke,
 amelyben ugyanez a munka folyik, és a szerkezetéért vettem: olvasási sor (Matter), sok beérkező elem szétválogatása
@@ -129,6 +168,109 @@ A funkció mindhárom irányban ugyanaz; a tábla azt mutatja, mi hol van, és h
 | Spec-eltérés (elrendezés) | gyorsgombok balra; a Szűrő a keresősor alatt; a HUD nem jobb felül | gyorsgombok alul; a keresőmező ikon mögött; csoport fülként is; a HUD bal felül | gyorsgombok alul; a keresőmező gomb mögött; csoport a morzsamenüben is; a HUD bal felül |
 | 1. szempont: erősség (bejárás) | a keresés egy gépelés; a találat oka és részlete a legolvashatóbb | a legtöbb tab egy képernyőn; csoportváltás és altatás egy kattintás | minden soron látszik a webhely, az ár és az utolsó használat; az ár szerinti összevetés a legkönnyebb |
 | 1. szempont: gyengeség (bejárás) | a két soros tétel miatt kevesebb tab fér ki | a keresés egy kattintással vagy `/`-rel nyílik; 320 px-en a domain kimarad | a keretes sor sok helyet vesz el; 320 px-en 4 tab fér ki |
+
+## Választott: B, változtatásokkal (alap: Superhuman Mail)
+Karesz kommentjei szerint (lásd Kötött). Az alap a B egysoros listája marad; a többi forrásból megnevezett részletek
+jönnek, mindegyik Karesz szavával. A korábbi A, B és C szakasz alább változatlan, a részletek forrásaként.
+
+### Szerkezet
+Felül a keresőmező mindig nyitva (az A-ból), jobbra három ikon: ablakkapcsoló (Ez az ablak / Minden ablak, a TS1
+kapcsolója), Szűrő, Rendezés. Alatta a bekapcsolt szűrők sora. A lista a B egysoros sora; a csoportok fejléce a C
+szakaszcíme (nyíl a bal szélen, pötty, félkövér név, darabszám), a jobb szélén rámutatásra gyorsgombok: a csoport
+altatása, mentése munkamenetként (TS3), áthelyezése másik ablakba; hogy melyik látszik, a „⋯” menüben választható.
+Bekapcsolható bal oldali csoportsáv (a „⋯” menüben): a csoportok függőlegesen, pöttyel, névvel és darabszámmal, egy
+kattintás arra a csoportra szűkít (a B felső fülei, függőlegesen). Kereséskor a találatok az ok szerint (Cím, Szöveg,
+URL) a C szakaszcímeivel, fölöttük a darabszám sora, alattuk a más ablak találatai gombbal. Üres találat a C formájában.
+Kijelöléskor a C alsó sávja („N kijelölve · Mégse · Rendezés”), a kereső fent marad. A visszajelzés a C sávja a lista
+alján. A futó felirat a videós tab alatt egy sorban (folyamatkör, Átirat, Megszakítás), az indítón százalék, az
+eszköztár-ikon jelvényén is; elkészülte után a sor eltűnik, a sávban „A felirat elkészült.”. Az összefoglaló és az
+átirat a C lapja; a prompt mező kimarad a fejlécből, a „Kész” címke helyett futás közben folyamatkör, utána semmi; az
+Összefoglaló indítóján is a folyamatkör. Alul csak az indítók és a „⋯” (sűrűség, csoportsáv, gyorsgombok, videó
+zónái, beállítások), a teljes szélességben elosztva. A videó a Video Dominator mintájára (lent: Videó).
+Spec-eltérés (javaslat): a gyorsgombsor fent helyett alul; a csoport altatása és áthelyezése új funkció (az ATD2 és a
+TS1 mellé); a felirat állapota a videón nem jelenik meg (SG6: csak a jelvényen és a panelben); a videó eltérései
+lent, a Videó alszakaszban.
+
+### Vonások forrásai (Kapuk 2.): ami változott a B-hez képest
+| Vonás | Érték | Forráskép és hely | Szerepe a forrásban | Eltérés és oka |
+| --- | --- | --- | --- | --- |
+| Keresőmező | mindig nyitva, 15 px 400 `#2f3033`, nagyító `#8a8a8a`, alatta 1 px `#edeef0`; helykitöltő „Keresés: cím, URL, szöveg”, 340 px-nél keskenyebb listán „Keresés” | matter-kereses: a keresőmező a lista fölött | keresés | Karesz: „a helyét töltse ki a kereső mező alapértelmezetten”; a rövid helykitöltő a bejárás után: 320 px-en a hosszú levágódott |
+| Felső ikonok | 16 px vonalas ikon `#6b6b6b`, bekapcsolva és rámutatáskor `#2f3033`; az ablakkapcsoló ikonja vált (egy ablak / több ablak) | programa-rendezes-ar: „Search · Filter · Sort” ikonjai (`#6b6b6b`) | lap műveletei | Karesz: az „Ez az ablak” „toggle ikonként” a kereső-szűrő-rendező mellé |
+| Sor betűi | cím 13 px 600 `#2f3033`; ár, domain, idő 12 px 400 `#8a8a8a`, az idő kisbetűs („14:05”, „tegnap”, „nov. 4.”) | C cím (13 px 600), A meta (12 px); programa: morzsamenü szürkéje (`#8a8a8a`, másodlagos szöveg) | tétel neve, másodlagos szöveg | Karesz: „az A és C változatok jelentősen jobban néznek ki”; a B vékony 16 px-es fejléce és nagybetűs ideje kimarad |
+| Csoportfejléc | 12 px 600 `#2f3033`, előtte 14 px nyíl `#8a8a8a`, pötty, darabszám `#8a8a8a`; rámutatásra jobbra 24 px-es ikongombok `#6b6b6b` (hold, könyvjelző, kilépő nyíl) | programa: oldalsáv „⌄ Mid-century modern bedr…” (C szakaszcím); a gombok: superhuman sor rámutatásra megjelenő ikonjai | kinyitható projekt; gyors döntés | Karesz: „az C csoportfelirat dizájnját”, „a jobb szélére … opcionális gyors gombokat” |
+| Csoportsáv | 64 px széles, `#f8f8f8`, jobbról 1 px `#e8e8e8`; tételenként 10 px pötty (Mind: üres kör, Csoport nélkül: szaggatott kör), alatta név 11 px és darabszám 10 px; a kiválasztott `#2f3033` 600, a többi `#8a8a8a` | turo-ikonsav: ikon, alatta rövid felirat egy keskeny sávban; programa: oldalsáv alapszíne `#f8f8f8`; superhuman: a fülek aktív/halvány színe | navigáció; oldalsáv | Karesz: „ezt a sávot kapcsolhatnánk …, csak az ikonok helyett … a tab csoportok”; alapból ki |
+| Menük | a C felugrója: fehér, 1 px `#e8e8e8` keret, 6 px sarok, `0 6px 20px` 8% árnyék; fejléc 12 px 600 `#2f3033`; tétel 12 px `#3a3c40`, 28 px; jelölő tételnél négyzet, választónál pipa; elválasztó `#e8e8e8`; rámutatás `#f8f8f8` | programa-rendezes-ar: „Sort by · Price ▾ · Sort within sections” | rendezés | Karesz: „látszódnak az elválasztók, és a checkbox is hasonló” |
+| Kijelölési sáv | a lista alján, fölötte 1 px `#e8e8e8`: „4 kijelölve” 12 px, „Mégse” másodlagos (`#f2f2f2`), „Rendezés” fő gomb (`#161616`, fehér 12 px 600, 6 px sarok) | programa: „Bulk Quotes” és „Share” gombok (C kijelölési sáv) | mellékművelet, a lap fő művelete | Karesz: „ilyet szeretnék a B változathoz is, és akkor fent meg tud maradni a kereső sáv”; a fekete csak itt és a Küldés gombon |
+| Üres találat | cím 13 px 600, magyarázat 12 px `#8a8a8a`, másodlagos gomb | C üres állapot (saját döntés a Programa gombjaiból) | – | Karesz: „hasonló formázást szeretnék a B változatnál” |
+| Találatok | darabszám sora 12 px `#8a8a8a`, utána szakaszok: Cím, Szöveg, URL (a csoportfejléc formájában, nyíl nélkül); a más ablak sora szöveg + másodlagos gomb „Mutasd” | coda-kereses: „Pages / Text / Docs” | találatok csoportja | Karesz: a darabszám és a más ablak sora „nagyon beleolvad” |
+| Visszajelzés | sáv a lista alján, fölötte 1 px `#e8e8e8`, 12 px `#8a8a8a`, × | C visszajelzés (saját döntés) | – | Karesz: „a C-nek ezek a visszajelző dolgai sokkal jobban sikerültek” |
+| Futó munka | folyamatkör: 11 px kör, 1 px `#2f3033`, kitöltés a százalék szerint; a videós tab alatt: kör + „Felirat készül · Átírás 42%” + Átirat, Megszakítás (másodlagos); az indítón ikon + „42%” 12 px 600; az Összefoglaló indítóján kör | programa: „◯ Quoting” köre (C folyamatkör) | állapot | Karesz: „ilyen töltés jelzőt szeretnék a B változathoz is”, „lehetne az alul lévő ikonon is”; a „Kész” címke kimarad: „utána akár el is tűnhet” |
+| Összefoglaló, átirat | a C lapja: „← Tabok / Összefoglaló”, cím 15 px 600, mezősor (Forrás, Oldal), szöveg 13 px / 1,6; alul mentett promptok másodlagos gombként, mező, „Küldés” fő gomb; az átirat táblázat időbélyeggel | programa: mezősor (C lap) | értékek | Karesz: „itt is az áttekinthetőség nyer”; a prompt mező kimarad a fejlécből |
+| Alsó sor | csak az indítók és a „⋯”, 16 px ikonok `#6b6b6b`, a teljes szélességben elosztva; fölötte 1 px `#edeef0` | superhuman: jobb alsó ikonsor | eszközök | Karesz: „az itt lent maradó ikonok pedig szerintem töltsék ki ezt a részt is” |
+| Jelvény az ikonon | `#2b2b2b` alap, fehér szöveg | C jelvény (programa mezőérték színe) | érték | a felirat állapota a videón helyett itt (Karesz: „akár az extension ikonján is”) |
+| A videón | lásd lent: Videó (a B értesítéssávja a videóról kikerül) | – | – | Karesz: „a lejátszót még át kell gondolnunk”, „a visszajelzéseket is átgondoljuk még” |
+Ami marad a B-ből: fehér alap; egysoros sor 34 px (kompakt 28 px); a kurzor sora (`#eef3f9`, 3 px `#c4c8ea` csík) csak az
+aktív tabon; a kijelölt sor `#dfeaf7` jelölőnégyzettel (Notion Mail); a sor műveletei rámutatásra (hold vagy nap, „⋯”);
+állapotikonok; az ár a cím után; rendszerbetű (Windows: Segoe UI).
+
+### Videó: szerkezet és vonások (alap: Video Dominator)
+Forrás: Karesz képernyőképei a saját Video Dominator-beállításáról és -lejátszójáról, 2026-11-07 (`refs/vd-*.jpg`, kép
+megnézve). A lejátszó két képe 4K-s képernyőről, 175%-os nagyítással készült: a képpontokat ezzel osztottam.
+
+Szerkezet. Az oldal videóján (VD1–VD7) görgetésre csak a visszajelzés jelenik meg, a videó közepén, kb. 1 mp-ig, gomb
+nélkül; a felirat állapota nem kerül a videóra. A saját lejátszó (VD8) teljes ablakban vagy teljes képernyőn csak a
+videót és alul egy folyamatsávot mutat (Karesz: „elég a videó alján egy állítható vastagságú (default/action)
+seekbar”): alapból vékony, görgetés és ugrás közben, illetve rámutatáskor vastagabb; rámutatáskor a kurzor helyén
+előnézeti kép, alatta az időpont (VD8 tekerési előnézet). A zónákat a panel „Videó zónái” nézete állítja (a „⋯”
+menüből): bemenetenként külön rács (görgő, egérgombok), mint a VD-ben, zónánként a műveletek; zónára kattintva a
+műveletek a bemenetükkel (például „Alt + középső”) és „+ Művelet”. A prototípus adata Karesz VD-beállítása (görgő
+2 × 3, a felső sor a magasság 2/3-a, az alsó 1/3; gombok 2 × 2, a felső sor 42%, az alsó 58%; a vd-zonak-gorgo és
+vd-zonak-egergombok rácsvonalaiból kimérve), és a prototípus videója e szerint működik: bal gomb lejátszás vagy
+szünet, Alt + középső gomb a saját lejátszót nyitja (felül ablakban, alul teljes képernyőn).
+Spec-eltérés (javaslat): VD2 a VD mintájára bemenetenként saját rács (sorok × oszlopok), zónánként több művelet,
+módosítóbillentyűvel; VD7 a videó közepén (Karesz VD-jében így áll; beállítható), gomb nélkül, ezért a „Felirat”
+indítása a panelből és a videó helyi menüjéből; VD8 vezérlősor helyett csak a folyamatsáv (a menü helye nyitott:
+felirat, sebesség, kép a képben; a VD8 testreszabását Karesz később tervezi, SPEC 39. sor).
+
+| Vonás | Érték | Forráskép és hely | Szerepe a forrásban | Eltérés és oka |
+| --- | --- | --- | --- | --- |
+| Folyamatsáv | alul, 16 px-re a bal, a jobb és az alsó széltől; alap 2 px, művelet közben (kb. 2 mp) és rámutatáskor 6 px; kerek vég; kitöltés `#ff9000`, alapja áttetsző világos | vd-lejatszo-sav (2 px, 16 px-es behúzás), vd-lejatszo-ido (6 px, kerek vég), vd-beallitasok-sav (Height Active 2, Hover 6, Inactive 2 px; Padding 16 px; Color `#ff9000`) | a saját lejátszó folyamatsávja, beállítható | a művelet vastagsága itt 6 px, hogy a különbség látsszon (Karesz VD-jében az aktív is 2 px), és tétlenül is látszik (ott tétlenül 0%); mindkettő beállítás, Karesz „default/action” szava szerint. Az alap a képen minden színt kb. 60 egységgel világosít: `rgba(255,255,255,.4)` a közelítés; világos videón alig látszik, a VD képén is így (vd-lejatszo-ido, a fehér asztal fölött) |
+| Időcímke | sötét doboz `#201f1f`, 3 px sarok, fehér 16 px szöveg, belső margó 4 × 9 px; a kurzor fölött, a sávtól 17 px-re; a sávon 1 px-es sötét jel a kurzor helyén | vd-lejatszo-ido (kimérve: 55 × 27 px, „05:11”) | a rámutatott időpont | – |
+| Előnézeti kép | 160 × 90 px, 3 px sarok, 2 px `#201f1f` keret, az időcímke fölött 4 px-re, vízszintesen a kurzorhoz igazítva | spec VD8: „kis kép az adott pillanatról, alatta az időpont” | – | a VD csak időt mutat; a kép formája saját döntés (az időcímke sarka és színe); a keret a bejárás után: nélküle a kép beleolvadt a videóba |
+| Visszajelzés | az időcímke formája, a videó közepén, kb. 1 mp: „Hangerő 70%”, ugrásnál „12:09 / 41:10”, sebességnél „Sebesség 1,75×”, középső gombnál „Szünet” | vd-beallitasok-visszajelzes (Action Info: Position Center, Margin 16, On Seek: Current Time / Duration, Font Size 100%); a forma: vd-lejatszo-ido | a VD visszajelzése (Action Info) | a VD visszajelzéséről nincs kép: a formát a látott időcímkéről vettem (ugyanannak a lejátszónak a fedőrétege), egy képpel ellenőrizendő. A spec (VD7) a jobb felső sarkot írja |
+| Zónák nézete | a panel C lapja: „← Tabok / Videó zónái”; bemenetenként szakaszcím („Görgő”, „Egérgombok”) és „Rács: 2 × 3” választó; 16:9-es keret, 1 px `#e8e8e8` vonalakkal zónákra osztva; zónánként a műveletek 11 px-en (görgőnél ↑ és ↓ jellel, egérgomboknál a művelet alatt a bemenete `#8a8a8a`-val, például „Alt + középső”); rámutatáskor `#f8f8f8`; kattintásra a C felugrója: a zóna műveletei, mellettük a bemenet másodlagos gombként ×-szel, alul „+ Művelet” | vd-zonak-gorgo, vd-zonak-egergombok (rács, zónánként a műveletek), vd-zona-szerkesztese (Edit Zone: művelet, bemenet csipben ⊗-val, „ADD ACTION”) | a VD zónabeállítása | a szerkezet a VD-é, a külső a választott irányé: a VD sötét, piros fejlécű beállításoldala nem kerül át. A VD rácsa csak a műveletet mutatja, a bemenetet a zóna szerkesztője (vd-zona-szerkesztese); itt a rácsban is, mert Karesz két felső gombzónája ugyanazt a két műveletet adja, és bemenet nélkül nem látszik, melyik gomb mit indít |
+
+### Reference lock
+- Elsődleges: Superhuman Mail (a lista); a videón a Video Dominator (saját lejátszó, visszajelzés, zónák).
+- Megőrzendő: egysoros, sűrű sorok; a kurzor sora az aktív tabon; rámutatásra megjelenő sorműveletek; a csík csak az
+  aktív tab jele.
+- Csak átvett, Karesz szavával: a Programa (C) szakaszcíme, felugrója, gombjai (másodlagos, fő), mezősora és
+  folyamatköre; a C visszajelző sávja és üres állapota; a Coda ok szerinti csoportosítása; a Matter mindig nyitott
+  keresőmezője; a Turo keskeny sávjának szerkezete a csoportsávhoz; a Notion Mail kijelölt sora. A videón a Video
+  Dominator folyamatsávja, időcímkéje, a visszajelzés helye és a bemenetenkénti zónarács.
+- Szerepszabályok: fekete (`#161616`) csak a nézet egyetlen fő gombja (kijelöléskor Rendezés, utókérdésnél Küldés);
+  `#f2f2f2` csak másodlagos gomb; `#f8f8f8` csak oldalsáv (csoportsáv) és rámutatás (menü, zóna, átirat sora); a levendula csík csak
+  az aktív tab; a halványkék `#dfeaf7` csak kijelölés; a csoportszín csak pötty; a narancs `#ff9000` csak a saját
+  lejátszó sávjának kitöltése; a sötét `#201f1f` csak a videón megjelenő címke (idő, visszajelzés, előnézet).
+- Elutasítva: csoportfülek felül, rejtett keresőmező, vékony 16 px-es fejlécbetű, nagybetűs idő, lebegő értesítés a
+  panelben, „Kész” címke, keretes sorok (a C kártyái), sötét alap; a videón értesítéssáv, gomb a visszajelzésben, a
+  felirat állapota, a natív lejátszót utánzó vezérlősor; a VD sötét, piros fejlécű beállításoldala.
+
+### Tokenek
+```css
+--b2-bg:#ffffff; --b2-text:#3a3c40; --b2-strong:#2f3033; --b2-sec:#8a8a8a; --b2-icon:#6b6b6b; --b2-line:#edeef0;
+--b2-border:#e8e8e8; --b2-side:#f8f8f8; --b2-hover:#f8f8f8; --b2-btn2:#f2f2f2; --b2-primary:#161616;
+--b2-cursor-bg:#eef3f9; --b2-cursor-bar:#c4c8ea; --b2-selected:#dfeaf7; --b2-label:#a8a8a8;
+--b2-pop-shadow:0 6px 20px rgba(0,0,0,.08); --b2-radius:4px; --b2-radius-btn:6px; --b2-on-primary:#ffffff;
+--b2-player-bg:#000000 /* a saját lejátszó háttere a videó körül */;
+--b2-seek:#ff9000 /* csak a saját lejátszó sávjának kitöltése */; --b2-seek-track:rgba(255,255,255,.4); --b2-seek-mark:rgba(0,0,0,.5);
+--b2-seek-h:2px; --b2-seek-h-action:6px; --b2-seek-inset:16px;
+--b2-osd:#201f1f; --b2-osd-text:#ffffff; --b2-osd-radius:3px /* csak a videón: időcímke, visszajelzés, előnézet */;
+--b2-font:"Segoe UI",system-ui,sans-serif; --b2-title:600 13px/1.3 var(--b2-font); --b2-meta:400 12px/1.3 var(--b2-font);
+--b2-search:400 15px/1 var(--b2-font); --b2-head:600 12px/1 var(--b2-font); --b2-osd-font:400 16px/19px var(--b2-font);
+--b2-zone-font:400 11px/1.35 var(--b2-font); --b2-doc-title:600 15px/1.3 var(--b2-font); --b2-label-font:600 9px/1.2 var(--b2-font);
+/* jelvény az ikonon (a keret rajzolja): háttér #2b2b2b, szöveg #ffffff */
+```
 
 ## A irány: Matter (olvasási sor)
 ### Szerkezet
@@ -332,7 +474,9 @@ Spec-eltérés (javaslat): a gyorsgombsor fent helyett az alsó eszközsor; a ke
 
 ## Sötét mód (mindhárom irány)
 A TS10 a rendszer szerinti sötét módot kéri. Egyik alap sötét képét sem néztem meg, ezért a prototípusok világosak;
-a választott irány sötét tokenjei a döntés után, az alap sötét képeiből készülnek, az „elfogadva” előtt.
+a választott irány sötét tokenjei a döntés után, az alap sötét képeiből készülnek, az „elfogadva” előtt. Ehhez még egy
+lekérdezés kell a Superhuman Mail sötét képeire (a keret, 12 lekérdezés, már elfogyott: Karesz dönt a folytatásról);
+a VD sötét beállításoldala nem forrás, mert a panel alapja a Superhuman.
 
 ## Sablonellenőrzés
 Az `anti-ai-slop.md` és a skill sorai szerint, a bejárás képein ellenőrizve, irányonként. Mindhárom: fehér alap, világos
@@ -340,6 +484,15 @@ mód (a TS10 sötét módja a döntés után), nincs indigó, színátmenet, üv
 jelei helyett szöveg vagy vonalas ikon), betűs ál-favicon, gyorsgomb-csempe. A szöveg mindhárom irányban ugyanaz, a
 spec és a munkafolyamat szavaival (Altatva, Hangot ad, Ne altasd, Szűrők törlése, Rendezés, Leállítás, Felirat,
 Átírás, Megszakítás, Átirat), mert a közös működésből jön.
+
+### Választott: B, változtatásokkal (a bejárás képein, 1440 és 1024 px)
+| Sor | Eredmény |
+| --- | --- |
+| Külső | van: levendula csík `#c4c8ea` az aktív tab szélén; indok: superhuman-split-inbox, ugyanebben a szerepben (a kurzor sora), jelentése egy szó: aktív; máshol nincs oldalcsík, a visszajelzés sávja csík nélküli (a C-é). Van: narancs `#ff9000` a saját lejátszó sávjának kitöltésén; indok: Karesz VD-beállítása (vd-beallitasok-sav), ugyanebben a szerepben, máshol nem szerepel. Van: sötét `#201f1f` doboz a videón (időcímke, visszajelzés, az előnézet kerete); indok: vd-lejatszo-ido. Van: keretes, árnyékos felugró; indok: Karesz szava („látszódnak az elválasztók”) és programa-rendezes-ar, felugró szerepben. Van: `#f8f8f8` két helyen (csoportsáv, rámutatás); indok: a Programában semleges másodlagos felület, mindkét helyen ebben a szerepben. Nagybetű csak a mezősor címkéin, betűközzel (programa: mezőcímkék). Fekete csak a nézet egyetlen fő gombja (Rendezés, Küldés). Nincs: kártya a sorokon, színátmenet, üvegpanel, emoji, sötét téma, indigó kiemelőszín, talpas betű. |
+| Szerkezet | van: bekapcsolható bal oldali sáv a lista mellett, ami az „oldalsáv + tartalom” héjra hasonlít; indok: Karesz szava („opcionálisan ezt a sávot … kapcsolhatnánk …, csak az ikonok helyett … a tab csoportok”), alapból ki, és a csoportszűrő függőleges formája, nem navigáció. Van: három egyenrangú ikon a kereső mellett (ablak, Szűrő, Rendezés) és három gyorsgomb a csoportfejlécen; indok: Karesz szava (az ablakváltó „toggle ikonként a kereső-szűrő-rendező csoport mellé”, „opcionális gyors gombokat”); a fontossági sorrendet a mindig nyitott keresőmező adja, kijelöléskor a fekete Rendezés; a gyorsgombok csak rámutatásra látszanak, és a „⋯” menüben kikapcsolhatók. Az alsó indítók egyenrangúak: a spec modulindítói (Karesz: „töltsék ki ezt a részt”). |
+| Tartalom és szöveg | nincs: a szövegek a közös működésből (a spec és a munkafolyamat szavai); a zónák Karesz VD-beállításának műveletei magyarul („Hangerő +5%”, „Előre 30 mp”, „Saját lejátszó (ablak)”, „Bal gomb”); üres találatnál kimondja, hol keresett, és a következő lépést adja („Keresés törlése”); a zónák nézete egy mondatban mondja meg, hogyan működik. Ikon nem áll minden címke mellett: a menükben csak a „+ Művelet” és a „Vissza” kap ikont (vd-zona-szerkesztese: „+ ADD ACTION”). |
+| Mozgás | nincs: átmenet és animáció nincs; a sáv vastagodása rámutatásra és művelet közben ugrásszerű, a VD beállítása szerint (Height Hover 6 px), állapotjelzés; a visszajelzés kb. 1 mp után eltűnik. |
+| Folyamat (csereteszt) | nincs: a lista vázát a Superhuman képe és Karesz szava indokolja; a tabokra jellemző rész a Chrome-csoportszín pöttyként, az altatás, az ár, az ablakkapcsoló, a csoport altatása és áthelyezése, a futó felirat a videós tab alatt, a jelvény az eszköztár ikonján, a videó zónái és a saját lejátszó. |
 
 ### A · Olvasási sor
 | Sor | Eredmény |
@@ -422,14 +575,59 @@ Mit javítottam a visszanézés után:
   karakter látszik belőle („aruke…”).
 - C: a nem használt `--c-seg` token kivéve; a kérdésmező gombja „Küldés” (a mező „Kérdezz az oldalról”).
 
+### Választott: B, változtatásokkal (`prototipus/kor-2/b-valtoztatassal/`)
+Ugyanaz a két méret és ugyanaz a környezet. Hat állapot a munkafolyamatból, ahol a változtatások látszanak:
+| Állapot | Mit mutat | 1440×900 (400 px-es panel) | 1024×720 (320 px-es panel) |
+| --- | --- | --- | --- |
+| Csoportsáv | a sáv bekapcsolva; rámutatás a „Porszívó” fejlécén: a három gyorsgomb | `csoportsav-1440.png` | `csoportsav-1024.png` |
+| Keresés | „légcsatorna”: darabszám sora, „Cím” és „Szöveg” szakasz, „A 2. ablakban még 2 találat · Mutasd” | `kereses-1440.png` | `kereses-1024.png` |
+| Nincs találat | „dyson v15”: hol keresett, „Keresés törlése” | `ures-1440.png` | `ures-1024.png` |
+| Kijelölés | négy porszívó kijelölve, alul „4 kijelölve · Mégse · Rendezés”, a Rendezés menü nyitva; a kereső fent | `kijeloles-1440.png` | `kijeloles-1024.png` |
+| Felirat | átírás 42%: a videós tab alatt a futó munka sora, az indítón és a jelvényen 42%; ugrás a videón, a visszajelzés középen („12:09 / 41:10”) | `felirat-1440.png` | `felirat-1024.png` |
+| Lejátszó és zónák | saját lejátszó ablakban, rámutatás a sávra: 6 px, előnézet és időcímke; a panelen a Videó zónái (görgő 2 × 3, egérgombok 2 × 2) | `lejatszo-1440.png` | `lejatszo-1024.png` |
+További képek ugyanott, ellenőrzéshez: `lista`, `szuro`, `osszefoglalo` (folyamatkör, Prompt mező nélkül), `video`
+(visszajelzés középen), `atirat`, mindegyik `-1440.png` és `-1024.png`.
+
+Interakciós teszt (a `data-` horgokon át): 87 lépés, mindkét méreten 87/87, konzolhiba nincs. A közös lépéseken túl:
+a keresőmező kattintás nélkül látszik, Esc csak a keresést törli; a találatok ok szerinti szakaszai; a kijelölési sáv,
+a kereső fent marad, Mégse; az összefoglaló folyamatköre a nézetben és az indítón, „Kész” címke nélkül; a zónák (bal
+felső görgő: hangerő +5% és −10%, jobb felső: sebesség, középső alsó: előre 30, vissza 10 mp, bal gomb: szünet), a visszajelzés kb. 1
+mp után eltűnik, a videón nincs gomb; a futó felirat sora, 42% az indítón és a jelvényen, elkészülte után a sor
+eltűnik; Alt + középső a felső zónában ablak, az alsóban teljes képernyő, Esc bezárja; a sáv 2 px és 16 px-es
+behúzás, rámutatásra 6 px előnézettel, kattintásra ugrás; a zónák nézete (a görgő felső sora kétszer olyan magas,
+művelet törlése és hozzáadása, rács 1 × 1 és vissza, a videó a módosított zóna szerint); ablakkapcsoló; a csoport
+gyorsgombjai (altatás a kivételekkel, mentés munkamenetként, áthelyezés új ablakba, az aktív tab marad), kikapcsolásuk;
+a csoportsáv szűkít, újra kattintva Mind, a beállítások megmaradnak. A közös modul bővítése után az A, B és C próbája
+változatlanul 105/105 mindkét méreten.
+
+Mit javítottam a visszanézés után: 320 px-en a keresőmező hosszú helykitöltője levágódott → 340 px alatt „Keresés”; az
+előnézeti kép beleolvadt a videóba → 2 px sötét keret; a görgőzónák címkéi 320 px-en rosszul törtek → a művelet a nyíl
+mellett folytatódik; a gombzónákban nem látszott, melyik gomb mit indít → a művelet alatt a bemenet; az előnézet a sáv
+elhagyása után is látszott → javítva.
+
+Ami maradt, és döntésre vagy ellenőrzésre vár:
+- 320 px-en a csoportsáv mellett 256 px marad a listának: a címek kb. 20 karakter után levágódnak, a domain kimarad.
+  Ezért alapból ki (Karesz: „opcionálisan”).
+- A sáv alapja világos videón alig látszik; a VD képén is így, sötét videón látszik.
+- A visszajelzés formája a VD időcímkéjéről vett, mert a VD visszajelzéséről nincs kép: egy képpel ellenőrizendő.
+- A Felirat a videón nem indítható (nincs gomb): a panelből és a videó helyi menüjéből; a Chrome helyi menüje a
+  prototípusban nem rajzolható.
+
 ## Prototípus
 Mappák: `prototipus/kor-2/a-olvasasi-sor/`, `prototipus/kor-2/b-szetvalogatas/`, `prototipus/kor-2/c-osszehasonlito/`.
 Közös: `keret.css` és `keret.js` (böngészőablak, oldal, videókép, a Chrome oldalpanel szürke fejléce, állapotváltó;
 nem része az iránynak), `mukodes.js` (a közös működés: minden funkció, menütétel és szöveg), `adat.js`, `ikonok.js`
 simple-icons márkajelekkel, `vonalas-ikonok.js` Lucide ikonokkal. Az irány `index.html`-je csak rajzol: a `draw`,
 `menuHTML` és `hudHTML` függvénye a közös állapotból, a gombjai `data-op` attribútummal a közös modult hívják.
+A választott: `prototipus/kor-2/b-valtoztatassal/` (`index.html`): ugyanarra a közös működésre épül; az irány saját
+rajza a csoportsáv, a csoportfejléc gyorsgombjai, a kijelölési sáv, a futó munka sora, a zónák nézete és a saját
+lejátszó. A közös modulba került a csoport altatása, mentése munkamenetként és áthelyezése (gyorsgombokhoz), a keretbe
+a zónák és a saját lejátszó horgai (`zoneAction`, `player`, `setPage`); az A, B és C ezeket nem használja. A fejléc
+állapotai: a kilenc közös, és Csoportsáv, Lejátszó. A prototípus a beállításokat (csoportsáv, gyorsgombok) a böngésző
+helyi tárában tartja.
 Helyben: a mappa `index.html`-je böngészőben, fent a „Prototípus” sorban az állapotok.
-Közzétéve (áttekintő oldal, rajta a három prototípus): https://claude.ai/artifact/SXrwPU4XAdfMvBMW6us1qo
+Közzétéve (áttekintő oldal, felül a választott B, alatta a három korábbi prototípus):
+https://claude.ai/artifact/SXrwPU4XAdfMvBMW6us1qo
 
 ## Elvetett
 Az 1. kör elvetett vonásai: `vizualis-irany-elvetve-1.md` „Elvetett” szakasza.
@@ -439,7 +637,25 @@ lista, NÉMÍTÁS és VISSZAVONÁS parancs. C: „Lista / Mezők” szegmentált
 irányváltóval és „Csoporton belül” kapcsolóval, „Sorrend a böngészőben is” fő gomb, ▾ az állapotcímkén.
 
 ## Ellenőrzőlista az 5. lépéshez
-(a döntés után)
+A felületi munkacsomag a megépült panelt és videót ezekkel veti össze (a választott B, változtatásokkal; a tokenek és a
+Reference lock fent, a prototípus `prototipus/kor-2/b-valtoztatassal/`):
+- Keresőmező mindig nyitva, `/` fókuszál, Esc csak a keresést törli; 340 px alatt rövid helykitöltő.
+- Egysoros sor 34 px (kompakt 28 px), cím 13 px 600, meta 12 px; a kurzor sora csak az aktív tabon; kijelölt sor
+  `#dfeaf7` jelölőnégyzettel; a sor műveletei rámutatásra.
+- Csoportfejléc a C formájában (nyíl, pötty, név, darabszám); gyorsgombok rámutatásra, a „⋯” menüben választhatók; a
+  „Rögzítve” és a „Csoport nélkül” fejlécen nincs gyorsgomb.
+- Csoportsáv alapból ki; bekapcsolva 64 px, szűkít, újra kattintva Mind; a beállítás megmarad.
+- Kijelöléskor alsó sáv („N kijelölve · Mégse · Rendezés”), a kereső fent marad; a fekete csak a fő gomb.
+- Találatok ok szerinti szakaszokban, a darabszám és a más ablak sora külön; üres találat a következő lépéssel.
+- Visszajelzés sávja a lista alján; futó felirat sora a videós tab alatt, százalék az indítón és a jelvényen,
+  elkészülte után a sor eltűnik; összefoglaló folyamatkörrel, „Kész” címke nélkül.
+- Videó: a visszajelzés középen, kb. 1 mp, gomb nélkül; zónák bemenetenként saját ráccsal, eltérő sormagassággal;
+  saját lejátszó: sáv 16 px behúzással, 2 px, művelet közben és rámutatáskor 6 px, `#ff9000`; előnézet 160 × 90 px
+  időcímkével; Esc és Alt + középső zár.
+- Windowson újramérni: a bejárás Linuxon tartalék betűvel készült, a Segoe UI kicsit keskenyebb.
+- Elférnek-e a mezők 320 px-en (csoportsávval is); egyértelmű-e a kijelölés; látszik-e a futó munka állapota;
+  javítható-e egy elrontott művelet (Mégse, a visszajelzés sávja).
+- Sötét mód (TS10): a választott irány sötét tokenjei az „elfogadva” előtt kerülnek ide (lásd Sötét mód).
 
 ## Változásnapló
 - 2026-11-07: 2. kör, tiszta lappal a frissített `dizajnkutatas` skill szerint. Az 1. kör fájlja nem volt a repóban,
@@ -462,3 +678,27 @@ irányváltóval és „Csoporton belül” kapcsolóval, „Sorrend a böngész
   szerint sincs: irány nincs kiválasztva, a téma világos (a sötét mód a döntés után), az elrendezés javaslat.
 - 2026-11-07: bejárás két méreten, kilenc állapottal; interakciós teszt 105/105, konzolhiba nincs; a javítások a
   Bejárás alatt.
+- 2026-11-07: Karesz 21 kommentje az áttekintőn: választva a B, változtatásokkal (lásd Kötött). Újraolvastam a
+  `dizajnkutatas` skill választási részét, a `refero-design`-t és az `anti-ai-slop.md`-t, ennek a fájlnak a
+  sablonellenőrzését és elvetett listáját, és újranyitottam a döntések képeit (superhuman-split-inbox,
+  programa-rendezes-ar, matter-kereses, notion-mail-kijeloles). Függő választás a forrásfájlok szerint: a téma világos
+  (sötét mód a TS10 szerint később), az elrendezés a kommentek szerinti, ajánlott irány nincs (a választás megtörtént).
+- 2026-11-07: tömörítés után újraolvastam a `dizajnkutatas` skillt (2. lépés, választás, továbblépés), a `refero-design`
+  Quality Gate-jét és az `anti-ai-slop.md`-t, ennek a fájlnak a sablonellenőrzését és elvetett listáját, és újranyitottam
+  a döntések képeit (superhuman-split-inbox, programa-rendezes-ar, matter-kereses, coda-kereses, notion-mail-kijeloles,
+  turo-ikonsav, plain-nezetek). Függő választás a forrásfájlok szerint: B változtatásokkal (fejléc), világos téma,
+  ajánlott irány nincs.
+- 2026-11-07: Karesz nyolc képe a Video Dominatorról (`refs/vd-*.jpg`): a videó szerkezete és vonásai a „Videó”
+  alszakaszban, a lejátszó sávját és időcímkéjét a képről mértem ki; a 13. lekérdezés és a csoportsáv képei a naplókban.
+- 2026-11-07: tömörítés után újraolvastam a `dizajnkutatas` skillt (2. lépés, 5. lépés, továbblépés), a
+  `refero-design` Quality Gate-jét és az `anti-ai-slop.md`-t, ennek a fájlnak a sablonellenőrzését és elvetett
+  listáját, és újranyitottam a döntések képeit (superhuman-split-inbox, programa-rendezes-ar, turo-ikonsav,
+  vd-lejatszo-ido, vd-zonak-gorgo, vd-zona-szerkesztese). Függő választás a forrásfájlok szerint: B változtatásokkal,
+  világos téma, ajánlott irány nincs. Új a képekről: a VD zónasorai nem egyformák (lásd Videó).
+- 2026-11-07: a változtatott B elkészült (`prototipus/kor-2/b-valtoztatassal/`), bejárva hat állapottal két méreten;
+  interakciós teszt 87/87, az A, B, C változatlanul 105/105. A bejárás utáni javítások a vonások tábláiba is bekerültek
+  (helykitöltő, az előnézet kerete, a gombzónák bemenete); a sablonellenőrzés és az 5. lépés ellenőrzőlistája kész.
+- 2026-11-07: tömörítés után újraolvastam a `dizajnkutatas` skillt (sablonellenőrzés, választás, 5. lépés,
+  továbblépés) és az `anti-ai-slop.md`-t, ennek a fájlnak a sablonellenőrzését és elvetett listáját, és újranyitottam a
+  döntések képeit (superhuman-split-inbox, programa-rendezes-ar, vd-lejatszo-ido). Függő választás a forrásfájlok
+  szerint: B változtatásokkal, világos téma (a sötét mód tokenjei hátravannak), ajánlott irány nincs.
