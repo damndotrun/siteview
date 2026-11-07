@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<title>Siteview irányok</title>
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; padding: 28px; background: #d9d9dc; font-family: Inter, sans-serif; color: #111; }
+.sheet { display: flex; flex-direction: column; gap: 14px; width: max-content; }
+.sheet-title { font: 600 22px/1.2 Inter; letter-spacing: -0.02em; margin: 0; }
+.sheet-sub { font: 400 13px/1.4 Inter; color: #555; margin: 0 0 6px; max-width: 1060px; }
+.row { display: flex; gap: 20px; align-items: flex-start; }
+.cap { font: 500 11px/1 'JetBrains Mono'; letter-spacing: .06em; text-transform: uppercase; color: #555; margin-bottom: 6px; }
+.stack { display: flex; flex-direction: column; gap: 20px; }
+
+/* ---------- közös váz ---------- */
+.panel { width: 340px; height: 592px; overflow: hidden; background: var(--bg); color: var(--text); font-family: var(--font); font-size: var(--fs); line-height: 1.4; display: flex; flex-direction: column; }
+.hdr { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+.brand { font: var(--brand-font); letter-spacing: var(--brand-track); margin: 0; }
+.nav { margin-left: auto; display: flex; gap: 4px; }
+.nav b, .nav span { font-weight: 500; padding: 3px 10px; border-radius: var(--r-nav); cursor: default; }
+.nav b { background: var(--nav-on-bg); color: var(--nav-on-text); box-shadow: var(--nav-on-shadow); }
+.nav span { color: var(--text-2); }
+.quick { display: flex; gap: 6px; padding: 10px 12px 4px; }
+.qb { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 7px 0 6px; border-radius: var(--r-btn); background: var(--qb-bg); border: var(--qb-border); box-shadow: var(--qb-shadow); color: var(--text-2); font-size: 11px; }
+.qb svg { width: 16px; height: 16px; color: var(--text); }
+.kbd { font: 500 10px/1 var(--mono); letter-spacing: .02em; color: var(--text-3); }
+.search { display: flex; gap: 6px; padding: 8px 12px; }
+.input { flex: 1; display: flex; align-items: center; gap: 6px; height: 30px; padding: 0 10px; border-radius: var(--r-input); background: var(--in-bg); border: var(--in-border); color: var(--text-3); }
+.input.focus { border: var(--in-focus-border); background: var(--in-focus-bg, var(--in-bg)); box-shadow: var(--in-focus-shadow, none); color: var(--text); }
+.input svg { width: 14px; height: 14px; }
+.caret { width: 1px; height: 14px; background: var(--text); margin-left: -4px; }
+.filter { display: flex; align-items: center; gap: 6px; height: 30px; padding: 0 10px; border-radius: var(--r-btn); border: var(--btn2-border); background: var(--btn2-bg); color: var(--text); }
+.filter .n { font: 500 10px/16px var(--mono); min-width: 16px; text-align: center; border-radius: var(--r-badge); background: var(--badge-bg); color: var(--badge-text); }
+.sect { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px 4px; font: var(--label-font); letter-spacing: var(--label-track); text-transform: var(--label-case); color: var(--text-3); }
+.list { list-style: none; margin: 0; padding: 0; }
+.grp { display: flex; align-items: center; gap: 8px; height: var(--row); padding: 0 12px; font-weight: 600; border-top: var(--grp-rule); }
+.grp .chev { width: 12px; color: var(--text-3); }
+.grp .dot { width: 8px; height: 8px; border-radius: var(--r-dot); background: var(--c); }
+.grp .count { font: 500 11px/1 var(--mono); color: var(--text-3); }
+.tab { position: relative; display: flex; align-items: center; gap: 8px; height: var(--row); padding: 0 8px 0 12px; border-bottom: var(--tab-rule); }
+.tab.in { padding-left: 32px; }
+.tab:hover, .tab.hov { background: var(--hover); }
+.tab.active { background: var(--active-bg); }
+.tab.active::before { content: ''; position: absolute; left: 0; top: var(--bar-inset); bottom: var(--bar-inset); width: var(--bar-w); border-radius: 0 2px 2px 0; background: var(--accent); }
+.fav { flex: none; width: 16px; height: 16px; border-radius: var(--r-fav); display: grid; place-items: center; font: 700 9px/1 Inter; color: #fff; background: var(--f); }
+.ttl { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.dom { flex: none; max-width: 92px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--dom-font); color: var(--text-3); }
+.st { flex: none; display: flex; gap: 4px; color: var(--text-2); }
+.st svg { width: 14px; height: 14px; }
+.st .live { color: var(--live); }
+.tab.sleep .fav, .tab.sleep .ttl, .tab.sleep .dom { opacity: var(--sleep-op); }
+.tab.sleep .ttl { font-style: var(--sleep-style); }
+.acts { display: none; gap: 2px; }
+.tab.hov .acts { display: flex; }
+.tab.hov .dom { display: none; }
+.ib { width: 22px; height: 22px; display: grid; place-items: center; border-radius: var(--r-ib); color: var(--text-2); }
+.ib.on { background: var(--ib-on-bg); color: var(--text); box-shadow: var(--ib-on-shadow); }
+.ib svg { width: 14px; height: 14px; }
+.mod { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-top: 1px solid var(--line); margin-top: auto; }
+.mod .t { flex: 1; display: flex; flex-direction: column; }
+.mod .t b { font-weight: 600; }
+.mod .t span { font-size: 11px; color: var(--text-2); }
+.sw { width: 30px; height: 18px; border-radius: var(--r-sw); background: var(--sw-on); position: relative; flex: none; }
+.sw::after { content: ''; position: absolute; top: 2px; right: 2px; width: 14px; height: 14px; border-radius: var(--r-sw); background: var(--sw-knob); box-shadow: var(--sw-knob-shadow); }
+.sw.off { background: var(--sw-off); }
+.sw.off::after { right: auto; left: 2px; }
+
+/* HUD a videón */
+.video { width: 520px; height: 270px; position: relative; overflow: hidden; border-radius: 6px;
+  background: radial-gradient(120% 90% at 30% 70%, #3b5a4a 0%, #1d2b25 45%, #0c1210 100%); }
+.video::before { content: ''; position: absolute; inset: 0; background: radial-gradient(40% 50% at 72% 38%, rgba(255,214,150,.55), transparent 70%), linear-gradient(180deg, transparent 60%, rgba(0,0,0,.35)); }
+.video .sub { position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%); padding: 4px 10px; font: 500 17px/1.3 var(--font); color: #fff; background: rgba(0,0,0,.55); border-radius: var(--r-sub); white-space: nowrap; }
+.hud { position: absolute; top: 12px; right: 12px; width: 204px; padding: 10px 12px; font-family: var(--font); font-size: 12px; color: var(--hud-text); background: var(--hud-bg); border: var(--hud-border); border-radius: var(--r-hud); box-shadow: var(--hud-shadow); backdrop-filter: var(--hud-blur); -webkit-backdrop-filter: var(--hud-blur); }
+.hud .big { display: flex; align-items: baseline; justify-content: space-between; }
+.hud .big strong { font: var(--hud-num); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.hud .big span { font: var(--label-font); letter-spacing: var(--label-track); text-transform: var(--label-case); color: var(--hud-text-2); }
+.meter { height: var(--meter-h); margin: 6px 0 8px; background: var(--meter-track); border-radius: var(--r-meter); overflow: hidden; }
+.meter i { display: block; height: 100%; width: 65%; background: var(--meter-fill); }
+.hud .line { display: flex; justify-content: space-between; font: 500 11px/1.6 var(--mono); color: var(--hud-text-2); font-variant-numeric: tabular-nums; }
+.hud .line b { color: var(--hud-text); font-weight: 500; }
+.steps { margin-top: 8px; padding-top: 8px; border-top: var(--hud-rule); display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--hud-text-2); }
+.steps .s { display: flex; align-items: center; gap: 4px; }
+.steps .s i { width: 6px; height: 6px; border-radius: var(--r-dot); background: var(--hud-text-2); opacity: .5; }
+.steps .s.done i { background: var(--ok); opacity: 1; }
+.steps .s.now { color: var(--hud-text); }
+.steps .s.now i { background: var(--live); opacity: 1; }
+.steps .pct { margin-left: auto; font: 500 11px/1 var(--mono); color: var(--hud-text); }
+.steps .x { font: 500 11px/1 var(--mono); color: var(--hud-text-2); border: var(--hud-border); border-radius: var(--r-ib); padding: 2px 5px; }
+.prog { height: 2px; margin-top: 6px; background: var(--meter-track); border-radius: var(--r-meter); overflow: hidden; }
+.prog i { display: block; height: 100%; width: 42%; background: var(--prog-fill); }
+
+/* ---------- 1. Obszidián (Raycast) ---------- */
+.d1 { --font: Inter, sans-serif; --mono: 'JetBrains Mono', monospace; --fs: 13px; --row: 30px;
+  --brand-font: 600 14px/1 Inter; --brand-track: -0.01em;
+  --label-font: 500 10px/1 Inter; --label-track: .073em; --label-case: uppercase;
+  --dom-font: 400 11px/1 'JetBrains Mono';
+  --r-nav: 8px; --r-btn: 8px; --r-input: 8px; --r-badge: 6px; --r-dot: 50%; --r-fav: 4px; --r-ib: 6px; --r-sw: 99px; --r-hud: 11px; --r-meter: 99px; --r-sub: 6px;
+  --bar-inset: 6px; --bar-w: 2px; --meter-h: 4px; --hud-num: 600 22px/1 Inter;
+  --grp-rule: none; --tab-rule: none; --sleep-style: normal; --sleep-op: .42;
+  --live: #ff6363; --ok: #59d499; }
+.d1.dark { --bg: #07080a; --text: #ffffff; --text-2: #9c9c9d; --text-3: #6a6b6c; --line: #1b1c1e;
+  --hover: #111214; --active-bg: #111214; --accent: #e6e6e6;
+  --nav-on-bg: #e6e6e6; --nav-on-text: #2f3031; --nav-on-shadow: none;
+  --qb-bg: #111214; --qb-border: 0; --qb-shadow: rgba(0,0,0,.4) 0 1.5px .5px 2.5px, #000 0 0 .5px 1px, rgba(0,0,0,.25) 0 2px 1px 1px inset, rgba(255,255,255,.2) 0 1px 1px 1px inset;
+  --in-bg: rgba(255,255,255,.05); --in-border: 1px solid rgba(255,255,255,.05); --in-focus-border: 1px solid rgba(255,255,255,.25);
+  --btn2-bg: transparent; --btn2-border: 1px solid #363739; --badge-bg: #1b1c1e; --badge-text: #fff;
+  --ib-on-bg: #1b1c1e; --ib-on-shadow: rgba(255,255,255,.05) 0 1px 0 inset, rgba(255,255,255,.25) 0 0 0 1px;
+  --sw-on: #e6e6e6; --sw-off: #363739; --sw-knob: #07080a; --sw-knob-shadow: none;
+  --hud-bg: rgba(17,18,20,.72); --hud-text: #fff; --hud-text-2: #9c9c9d; --hud-border: 1px solid rgba(255,255,255,.1); --hud-shadow: rgba(0,0,0,.28) 0 1.2px 2.4px; --hud-blur: blur(36px); --hud-rule: 1px solid rgba(255,255,255,.08);
+  --meter-track: rgba(255,255,255,.12); --meter-fill: #e6e6e6; --prog-fill: #ff6363; }
+.d1.light { --bg: #fafafa; --text: #111214; --text-2: #6a6b6c; --text-3: #9c9c9d; --line: #e6e6e6;
+  --hover: #f0f0f1; --active-bg: #ffffff; --accent: #2f3031;
+  --nav-on-bg: #2f3031; --nav-on-text: #fafafa; --nav-on-shadow: none;
+  --qb-bg: #ffffff; --qb-border: 0; --qb-shadow: rgba(0,0,0,.14) 0 1.5px .5px 1px, rgba(0,0,0,.08) 0 0 0 1px, rgba(255,255,255,1) 0 1px 0 0 inset;
+  --in-bg: rgba(0,0,0,.04); --in-border: 1px solid rgba(0,0,0,.04); --in-focus-border: 1px solid rgba(0,0,0,.28);
+  --btn2-bg: transparent; --btn2-border: 1px solid #d6d6d8; --badge-bg: #e6e6e6; --badge-text: #111214;
+  --ib-on-bg: #fff; --ib-on-shadow: rgba(0,0,0,.18) 0 0 0 1px;
+  --sw-on: #2f3031; --sw-off: #d6d6d8; --sw-knob: #fafafa; --sw-knob-shadow: none;
+  --hud-bg: rgba(250,250,250,.78); --hud-text: #111214; --hud-text-2: #6a6b6c; --hud-border: 1px solid rgba(0,0,0,.08); --hud-shadow: rgba(0,0,0,.18) 0 2px 8px; --hud-blur: blur(36px); --hud-rule: 1px solid rgba(0,0,0,.08);
+  --meter-track: rgba(0,0,0,.1); --meter-fill: #2f3031; --prog-fill: #ff6363; --live: #e5484d; --ok: #2f9e6c; }
+.d1 .tab.active { box-shadow: var(--ib-on-shadow, none); }
+.d1.light .tab.active { box-shadow: rgba(0,0,0,.06) 0 0 0 1px; }
+
+/* ---------- 2. Tervrajz (PlanetScale + Factory) ---------- */
+.d2 { --font: 'JetBrains Mono', monospace; --mono: 'JetBrains Mono', monospace; --fs: 12px; --row: 30px;
+  --brand-font: 600 13px/1 'JetBrains Mono'; --brand-track: -0.006em;
+  --label-font: 500 10px/1 'JetBrains Mono'; --label-track: .04em; --label-case: uppercase;
+  --dom-font: 400 11px/1 'JetBrains Mono';
+  --r-nav: 0; --r-btn: 0; --r-input: 0; --r-badge: 99px; --r-dot: 0; --r-fav: 0; --r-ib: 0; --r-sw: 0; --r-hud: 0; --r-meter: 0; --r-sub: 0;
+  --bar-inset: 0; --bar-w: 3px; --meter-h: 6px; --hud-num: 600 22px/1 'JetBrains Mono';
+  --sleep-style: normal; --sleep-op: .45; }
+.d2.light { --bg: #eeeeee; --text: #000; --text-2: #414141; --text-3: #737373; --line: #c1c1c1;
+  --hover: #fafafa; --active-bg: #fafafa; --accent: #0b6ec5; --live: #f35815; --ok: #22a652;
+  --grp-rule: 1px solid #c1c1c1; --tab-rule: 1px solid #e0e0e0;
+  --nav-on-bg: #111; --nav-on-text: #fafafa; --nav-on-shadow: none;
+  --qb-bg: #fafafa; --qb-border: 1px solid #c1c1c1; --qb-shadow: none;
+  --in-bg: #fafafa; --in-border: 1px solid #c1c1c1; --in-focus-border: 1px solid #0b6ec5; --in-focus-shadow: inset 0 0 0 1px #0b6ec5;
+  --btn2-bg: #fafafa; --btn2-border: 1px solid #c1c1c1; --badge-bg: #0b6ec5; --badge-text: #fff;
+  --ib-on-bg: #fafafa; --ib-on-shadow: inset 0 0 0 1px #0b6ec5;
+  --sw-on: #0b6ec5; --sw-off: #c1c1c1; --sw-knob: #fafafa; --sw-knob-shadow: none;
+  --hud-bg: #fafafa; --hud-text: #000; --hud-text-2: #414141; --hud-border: 1px solid #000; --hud-shadow: none; --hud-blur: none; --hud-rule: 1px solid #c1c1c1;
+  --meter-track: #e0e0e0; --meter-fill: #000; --prog-fill: #f35815; }
+.d2.dark { --bg: #0d0d0d; --text: #fafafa; --text-2: #c1c1c1; --text-3: #8a8a8a; --line: #414141;
+  --hover: #161616; --active-bg: #161616; --accent: #4b9be0; --live: #f56a2c; --ok: #3cc06b;
+  --grp-rule: 1px solid #414141; --tab-rule: 1px solid #1f1f1f;
+  --nav-on-bg: #fafafa; --nav-on-text: #111; --nav-on-shadow: none;
+  --qb-bg: #111; --qb-border: 1px solid #414141; --qb-shadow: none;
+  --in-bg: #111; --in-border: 1px solid #414141; --in-focus-border: 1px solid #4b9be0; --in-focus-shadow: inset 0 0 0 1px #4b9be0;
+  --btn2-bg: #111; --btn2-border: 1px solid #414141; --badge-bg: #4b9be0; --badge-text: #0d0d0d;
+  --ib-on-bg: #111; --ib-on-shadow: inset 0 0 0 1px #4b9be0;
+  --sw-on: #4b9be0; --sw-off: #414141; --sw-knob: #0d0d0d; --sw-knob-shadow: none;
+  --hud-bg: #0d0d0d; --hud-text: #fafafa; --hud-text-2: #c1c1c1; --hud-border: 1px solid #fafafa; --hud-shadow: none; --hud-blur: none; --hud-rule: 1px solid #414141;
+  --meter-track: #2a2a2a; --meter-fill: #fafafa; --prog-fill: #f56a2c; }
+.d2 .grp { font-weight: 600; }
+.d2 .hud { width: 232px; }
+.d2 .qb { font-size: 10px; }
+.d2 .nav b, .d2 .nav span { padding: 3px 8px; }
+
+/* ---------- 3. Munkafüzet (Rows) ---------- */
+.d3 { --font: Inter, sans-serif; --mono: 'JetBrains Mono', monospace; --fs: 13px; --row: 30px;
+  --brand-font: 700 15px/1 Inter; --brand-track: -0.043em;
+  --label-font: 500 11px/1 Inter; --label-track: .011em; --label-case: none;
+  --dom-font: 400 11px/1 Inter;
+  --r-nav: 8px; --r-btn: 8px; --r-input: 4px; --r-badge: 4px; --r-dot: 50%; --r-fav: 4px; --r-ib: 4px; --r-sw: 99px; --r-hud: 8px; --r-meter: 99px; --r-sub: 4px;
+  --bar-inset: 0; --bar-w: 2px; --meter-h: 4px; --hud-num: 700 22px/1 Inter;
+  --grp-rule: none; --tab-rule: none; --sleep-style: normal; --sleep-op: .45;
+  --sunset: linear-gradient(90deg, rgb(255,84,56), rgb(255,199,0)); }
+.d3.light { --bg: #ffffff; --text: #1a1a1a; --text-2: #6f6f6f; --text-3: #989898; --line: #e1e1e1;
+  --hover: #f7f7f7; --active-bg: #f7f7f7; --accent: #1a1a1a; --live: #ff5438; --ok: #1a1a1a;
+  --nav-on-bg: #eaeaea; --nav-on-text: #1a1a1a; --nav-on-shadow: none;
+  --qb-bg: transparent; --qb-border: 1px solid #eaeaea; --qb-shadow: none;
+  --in-bg: #fff; --in-border: 1px solid #e1e1e1;
+  --in-focus-border: 1px solid transparent; --in-focus-bg: linear-gradient(#fff,#fff) padding-box, linear-gradient(90deg, rgb(255,84,56), rgb(255,199,0)) border-box;
+  --btn2-bg: transparent; --btn2-border: 1px solid #eaeaea; --badge-bg: #fff6d4; --badge-text: #1a1a1a;
+  --ib-on-bg: #eaeaea; --ib-on-shadow: none;
+  --sw-on: #1a1a1a; --sw-off: #e1e1e1; --sw-knob: #fff; --sw-knob-shadow: none;
+  --hud-bg: #ffffff; --hud-text: #1a1a1a; --hud-text-2: #6f6f6f; --hud-border: 1px solid #e1e1e1; --hud-shadow: none; --hud-blur: none; --hud-rule: 1px solid #eaeaea;
+  --meter-track: #eaeaea; --meter-fill: #1a1a1a; --prog-fill: linear-gradient(90deg, rgb(255,84,56), rgb(255,199,0)); }
+.d3.dark { --bg: #161616; --text: #f2f2f2; --text-2: #a3a3a3; --text-3: #7a7a7a; --line: #2b2b2b;
+  --hover: #1f1f1f; --active-bg: #1f1f1f; --accent: #f2f2f2; --live: #ff6a4d; --ok: #f2f2f2;
+  --nav-on-bg: #2b2b2b; --nav-on-text: #f2f2f2; --nav-on-shadow: none;
+  --qb-bg: transparent; --qb-border: 1px solid #2b2b2b; --qb-shadow: none;
+  --in-bg: #161616; --in-border: 1px solid #2b2b2b;
+  --in-focus-border: 1px solid transparent; --in-focus-bg: linear-gradient(#161616,#161616) padding-box, linear-gradient(90deg, rgb(255,84,56), rgb(255,199,0)) border-box;
+  --btn2-bg: transparent; --btn2-border: 1px solid #2b2b2b; --badge-bg: #3a3220; --badge-text: #ffe7a3;
+  --ib-on-bg: #2b2b2b; --ib-on-shadow: none;
+  --sw-on: #f2f2f2; --sw-off: #3a3a3a; --sw-knob: #161616; --sw-knob-shadow: none;
+  --hud-bg: #1f1f1f; --hud-text: #f2f2f2; --hud-text-2: #a3a3a3; --hud-border: 1px solid #2b2b2b; --hud-shadow: none; --hud-blur: none; --hud-rule: 1px solid #2b2b2b;
+  --meter-track: #2b2b2b; --meter-fill: #f2f2f2; --prog-fill: linear-gradient(90deg, rgb(255,84,56), rgb(255,199,0)); }
+.d3 .tab.active::before { display: none; }
+.d3 .tab.active .ttl { font-weight: 600; }
+.d3 .prog { height: 3px; }
+</style>
+</head>
+<body>
+<div class="sheet" id="sheet"></div>
+<template id="panel">
+  <div class="panel">
+    <header class="hdr"><h1 class="brand">Siteview</h1><nav class="nav"><b>Tabok</b><span>Beállítások</span></nav></header>
+    <div class="quick">
+      <div class="qb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="1.5"/><circle cx="12" cy="12" r="3"/></svg>Kép<span class="kbd">Alt⇧P</span></div>
+      <div class="qb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6h16M4 12h10M4 18h13"/></svg>Összefoglaló<span class="kbd">—</span></div>
+      <div class="qb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 4l7 16 2-7 7-2z"/></svg>Kijelölő<span class="kbd">—</span></div>
+      <div class="qb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="6" width="18" height="12" rx="1.5"/><path d="M7 14h4M13 14h4"/></svg>Felirat<span class="kbd">—</span></div>
+    </div>
+    <div class="search">
+      <div class="input focus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg>porszívó<span class="caret"></span></div>
+      <div class="filter">Szűrő <span class="n">2</span></div>
+    </div>
+    <div class="sect"><span>Ez az ablak</span><span>9</span></div>
+    <ul class="list">
+      <li class="grp"><span class="chev">▾</span><span class="dot" style="--c:#1a73e8"></span>Kutatás<span class="count">3</span></li>
+      <li class="tab in active"><span class="fav" style="--f:#e33">Y</span><span class="ttl">Hogyan működik a faster-whisper?</span><span class="st"><svg class="live" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 9v6h4l5 4V5L8 9zM16 9a4 4 0 010 6M18.5 6.5a7.5 7.5 0 010 11"/></svg></span><span class="dom">youtube.com</span></li>
+      <li class="tab in hov"><span class="fav" style="--f:#333">M</span><span class="ttl">chrome.tabs – MDN Web Docs</span><span class="acts"><span class="ib"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z"/></svg></span><span class="ib on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/></svg></span></span><span class="dom">developer.mozilla.org</span></li>
+      <li class="tab in sleep"><span class="fav" style="--f:#2a7">W</span><span class="ttl">WXT – Content Script UI</span><span class="st"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z"/></svg></span><span class="dom">wxt.dev</span></li>
+      <li class="grp"><span class="chev">▾</span><span class="dot" style="--c:#fa903e"></span>Vásárlás<span class="count">2</span></li>
+      <li class="tab in"><span class="fav" style="--f:#f60">Á</span><span class="ttl">Philips XB2140 porszívó – Árukereső</span><span class="st"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/></svg></span><span class="dom">arukereso.hu</span></li>
+      <li class="tab in sleep"><span class="fav" style="--f:#06c">E</span><span class="ttl">Porszívók – eMAG.hu</span><span class="st"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z"/></svg></span><span class="dom">emag.hu</span></li>
+      <li class="tab"><span class="fav" style="--f:#0a5">G</span><span class="ttl">Kiadások 2026 – Google Táblázatok</span><span class="dom">docs.google.com</span></li>
+      <li class="tab sleep"><span class="fav" style="--f:#555">G</span><span class="ttl">damndotrun/siteview · GitHub</span><span class="st"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z"/></svg></span><span class="dom">github.com</span></li>
+    </ul>
+    <div class="mod"><div class="t"><b>Altatás</b><span>30 perc inaktivitás után altat</span></div><span class="sw"></span></div>
+    <div class="mod" style="margin-top:0"><div class="t"><b>Duplikátumok</b><span>A már nyitott tabra vált</span></div><span class="sw off"></span></div>
+  </div>
+</template>
+<template id="video">
+  <div class="video">
+    <div class="hud">
+      <div class="big"><strong>65%</strong><span>Hangerő</span></div>
+      <div class="meter"><i></i></div>
+      <div class="line"><span>Sebesség</span><b>1,50×</b></div>
+      <div class="line"><span>Idő</span><b>12:04 / 41:10</b></div>
+      <div class="steps"><span class="s done"><i></i>Letöltés</span><span class="s now"><i></i>Átírás</span><span class="s"><i></i>Kész</span><span class="pct">42%</span><span class="x">✕</span></div>
+      <div class="prog"><i></i></div>
+    </div>
+    <div class="sub">so the model runs on the CPU by default</div>
+  </div>
+</template>
+<script>
+const D = {
+  1: ['1 · Obszidián', 'Elsődleges forrás: Raycast. Semleges, majdnem fekete sötét mód; a gombok „lenyomható billentyűk” rétegzett árnyékkal; a fő gomb nem színes, hanem világos szürke; a vörös csak élő állapot (hang, futó munka). Inter, apró címkék szélesen spacingelve, rövidítések JetBrains Monóval. HUD: matt üveg.'],
+  2: ['2 · Tervrajz', 'Elsődleges forrás: PlanetScale, kiegészítve Factory.ai-jal. Minden szöveg monospace, 0 px sarkok, hajszálvonalas sorok, árnyék nincs. A kék csak interaktív (fókusz, aktív, kapcsoló), a narancs csak élő állapot. Világos szürke vászon, fehérebb sorok. HUD: fekete keretes műszerdoboz.'],
+  3: ['3 · Munkafüzet', 'Elsődleges forrás: Rows. Fehér, majdnem színtelen munkalap, tömör sorok, vékony szürke keretek. Az egyetlen meleg mozzanat a narancs–sárga színátmenet: csak a fókuszált keresőmező keretén és a futó folyamat sávján. Halvány arany jelvény a szűrőszámnál és a javaslat-chipeknél. HUD: fehér/sötét kártya.'],
+};
+const d = new URLSearchParams(location.search).get('d') || '1';
+const sheet = document.getElementById('sheet');
+sheet.innerHTML = `<h1 class="sheet-title">${D[d][0]}</h1><p class="sheet-sub">${D[d][1]}</p>`;
+const row = document.createElement('div'); row.className = 'row'; sheet.append(row);
+for (const mode of ['light', 'dark']) {
+  const col = document.createElement('div');
+  col.innerHTML = `<div class="cap">Oldalpanel · ${mode === 'light' ? 'világos' : 'sötét'}</div>`;
+  const wrap = document.createElement('div'); wrap.className = `d${d} ${mode}`;
+  wrap.append(document.getElementById('panel').content.cloneNode(true));
+  col.append(wrap); row.append(col);
+}
+const stack = document.createElement('div'); stack.className = 'stack';
+for (const mode of ['light', 'dark']) {
+  const col = document.createElement('div');
+  col.innerHTML = `<div class="cap">Videó HUD · ${mode === 'light' ? 'világos' : 'sötét'}</div>`;
+  const wrap = document.createElement('div'); wrap.className = `d${d} ${mode}`;
+  wrap.append(document.getElementById('video').content.cloneNode(true));
+  col.append(wrap); stack.append(col);
+}
+row.append(stack);
+</script>
+</body>
+</html>

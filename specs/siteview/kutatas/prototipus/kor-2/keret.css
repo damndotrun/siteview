@@ -1,0 +1,54 @@
+/* A prototípus kerete: egy asztali böngészőablak tartalma (oldal + oldalpanel). Nem része az iránynak. */
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: #dadce0; font-family: "Segoe UI", system-ui, sans-serif; color: #202124; overflow: hidden; }
+.browser { display: grid; grid-template-columns: 1fr var(--panel-w, 400px); grid-template-rows: 40px 1fr; height: 100vh; }
+@media (max-width: 1200px) { .browser { --panel-w: 320px; } .topbar .proto > span { display: none; } }
+.topbar { grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; padding: 0 12px; background: #f1f3f4; border-bottom: 1px solid #d5d7da; font-size: 12px; }
+.topbar .url { flex: 0 1 560px; min-width: 120px; height: 28px; line-height: 28px; padding: 0 12px; border-radius: 14px; background: #fff; color: #5f6368; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.topbar .ext { position: relative; flex: none; width: 28px; height: 28px; display: grid; place-items: center; }
+.topbar .ext-ico { width: 16px; height: 16px; border-radius: 4px; background: #5f6368; }
+.topbar .ext-badge { position: absolute; right: -6px; bottom: 1px; min-width: 16px; height: 13px; padding: 0 3px; border-radius: 3px; font: 600 9px/13px system-ui, sans-serif; text-align: center; }
+.topbar .proto { margin-left: auto; display: flex; gap: 2px; align-items: center; color: #80868b; white-space: nowrap; overflow: hidden; }
+.topbar .proto a { color: #5f6368; text-decoration: none; padding: 3px 6px; border-radius: 4px; }
+.topbar .proto a.home { margin-right: 8px; color: #1a73e8; }
+.topbar .proto a.on { background: #fff; color: #202124; }
+.page { position: relative; overflow: auto; background: #fff; border-right: 1px solid #d5d7da; }
+.panel-host { position: relative; overflow: hidden; background: #fff; display: flex; flex-direction: column; min-width: 0; }
+/* A Chrome oldalpanel saját fejléce (a böngészőé, nem a Siteview-é) */
+.cp-head { flex: 0 0 36px; display: flex; align-items: center; gap: 6px; padding: 0 8px 0 12px; font-size: 12px; color: #3c4043; background: #f1f3f4; border-bottom: 1px solid #dadce0; }
+.cp-head .cp-ico { width: 14px; height: 14px; border-radius: 3px; background: #5f6368; }
+.cp-head .cp-caret { color: #80868b; font-size: 10px; }
+.cp-head .cp-sp { flex: 1; }
+.cp-head .cp-btn { width: 24px; height: 24px; display: grid; place-items: center; color: #5f6368; }
+.panel-body { position: relative; flex: 1; min-height: 0; overflow: hidden; }
+.li { flex: none; display: block; }
+.dragging { opacity: .4; }
+/* A Chrome oldalon belüli keresésének jelölése (a keret része) */
+mark.find { background: #ff9632; color: inherit; padding: 0 1px; }
+
+/* Az aktuális oldal (harmadik fél oldala, semleges) */
+.article { max-width: 760px; margin: 0 auto; padding: 40px 48px; font: 16px/1.6 system-ui, sans-serif; color: #1f2328; }
+.article h1 { font-size: 30px; line-height: 1.2; margin: 0 0 12px; }
+.article p { margin: 0 0 14px; }
+.article code { background: #f3f4f6; padding: 1px 5px; border-radius: 4px; font-size: 14px; }
+.article .crumbs { font-size: 13px; color: #6b7280; margin-bottom: 18px; }
+
+/* Videóoldal: a videókép kódban rajzolt helykitöltő (egy képernyőfelvétel diája), hogy a HUD világos képen is látszódjon. */
+.vpage { padding: 24px 32px; font: 14px/1.5 system-ui, sans-serif; color: #0f0f0f; }
+.video { position: relative; width: 100%; max-width: 1040px; aspect-ratio: 16 / 9; background: #f7f7f5; overflow: hidden; border-radius: 10px; user-select: none; }
+.video .slide { position: absolute; inset: 0; padding: 7% 8%; font-family: system-ui, sans-serif; color: #1d1d1f; }
+.video .slide h2 { margin: 0 0 4%; font-size: clamp(18px, 2.6vw, 38px); }
+.video .slide .bar { display: flex; align-items: center; gap: 12px; margin: 2.2% 0; font-size: clamp(12px, 1.4vw, 20px); }
+.video .slide .bar span:first-child { width: 34%; }
+.video .slide .bar span:last-child { white-space: nowrap; }
+.video .slide .bar i { display: block; height: clamp(14px, 2vw, 30px); background: #3b82c4; border-radius: 3px; }
+.video .slide .bar i.slow { background: #b9bec4; }
+.video .slide .note { position: absolute; left: 8%; bottom: 13%; font-size: clamp(11px, 1.1vw, 15px); color: #6b6b6b; }
+.video .ph { position: absolute; right: 10px; top: 8px; font-size: 10px; color: #9aa0a6; }
+.video .native { position: absolute; left: 0; right: 0; bottom: 0; height: 44px; padding: 0 14px; display: flex; align-items: center; gap: 12px; color: #fff; font-size: 13px; background: linear-gradient(transparent, rgba(0,0,0,.55)); }
+.video .native .track { flex: 1; height: 3px; background: rgba(255,255,255,.35); position: relative; }
+.video .native .track b { position: absolute; left: 0; top: 0; bottom: 0; background: #f00; }
+.vpage h1 { font-size: 20px; margin: 14px 0 4px; }
+.vpage .ch { color: #606060; font-size: 13px; }
+.sub { position: absolute; left: 50%; bottom: 58px; transform: translateX(-50%); max-width: 80%; text-align: center; color: #fff; background: rgba(8,8,8,.72); padding: 4px 10px; font: 500 clamp(14px, 1.6vw, 22px)/1.35 system-ui, sans-serif; border-radius: 3px; }

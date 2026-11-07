@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A · Olvasási sor</title>
+<link rel="stylesheet" href="../keret.css">
+<style>
+/* A irány tokenjei: vizualis-irany.md „A irány” Tokenek. Csak ezek használhatók. */
+:root {
+  --a-bg:#ffffff; --a-text:#141414; --a-meta:#6f6f6f; --a-state:#9a9a9a; --a-line:#eeeeee;
+  --a-hit:#fbf3c6; --a-selected:#f4f4f4; --a-icon:#7f7f7f; --a-progress-track:#cccccc; --a-progress:#000000;
+  --a-hud:rgba(68,68,68,.92); --a-label-color:#808080; --a-dim:#8a8a8a; --a-tab-line:#0c0c0c;
+  --a-font-ui:"Segoe UI",system-ui,sans-serif; --a-font-read:"Sitka Text",Charter,"Bitstream Charter",Georgia,serif;
+  --a-title:600 14px/1.3 var(--a-font-ui); --a-meta-font:400 12px/1.35 var(--a-font-ui);
+  --a-label:600 11px/1 var(--a-font-ui); --a-read:400 15px/1.6 var(--a-font-read);
+  --a-radius-icon:6px; --a-row-pad:10px 14px;
+}
+.a { display: grid; grid-template-columns: 40px minmax(0, 1fr); height: 100%; background: var(--a-bg); color: var(--a-text); font: var(--a-meta-font); }
+/* Modulindítók: keskeny ikonoszlop felirat nélkül (Matter olvasónézet bal oldala) */
+.rail { display: flex; flex-direction: column; align-items: center; padding: 10px 0 8px; }
+.rail .mods { display: flex; flex-direction: column; gap: 4px; }
+.rail button { width: 32px; height: 32px; display: grid; place-items: center; border: 0; background: none; color: var(--a-icon); cursor: pointer; border-radius: var(--a-radius-icon); }
+.rail button:hover, .rail button.on { color: var(--a-text); }
+.rail button.busy { position: relative; }
+.rail button.busy::after { content: ""; position: absolute; left: 8px; right: 8px; bottom: 3px; height: 2px; background: linear-gradient(90deg, var(--a-progress) var(--p, 40%), var(--a-progress-track) 0); }
+.rail .sp { flex: 1; }
+.main { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+/* Keresősor: szegély nélküli mező, alatta hajszálvonal (Matter keresés) */
+.search { flex: none; display: flex; align-items: center; gap: 8px; height: 48px; padding: 0 10px 0 14px; border-bottom: 1px solid var(--a-line); }
+.search input { flex: 1; min-width: 0; border: 0; outline: 0; background: none; font: 400 15px/1 var(--a-font-ui); color: var(--a-text); padding: 0; }
+.search input::placeholder { color: var(--a-state); }
+.search .clear { border: 0; background: none; color: var(--a-icon); cursor: pointer; padding: 4px; display: grid; }
+.count { flex: none; padding: 8px 14px 6px; color: var(--a-meta); }
+.count b { font-weight: 600; color: var(--a-text); }
+.list { flex: 1; overflow: auto; min-height: 0; }
+.label { display: flex; align-items: center; gap: 7px; padding: 16px 14px 7px; font: var(--a-label); letter-spacing: .08em; text-transform: uppercase; color: var(--a-label-color); cursor: pointer; user-select: none; }
+.label i { width: 6px; height: 6px; border-radius: 50%; flex: none; }
+.label .n { font-weight: 400; }
+.row { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 0 10px; padding: var(--a-row-pad); border-bottom: 1px solid var(--a-line); cursor: pointer; }
+.row.on { background: var(--a-selected); }
+.row .ic { grid-row: span 3; width: 28px; height: 28px; border-radius: var(--a-radius-icon); background: var(--a-selected); display: grid; place-items: center; }
+.row.on .ic { background: var(--a-bg); }
+.row .ic .fav-none { color: var(--a-icon); }
+.row .t { font: var(--a-title); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row.slept .t { color: var(--a-dim); }
+.row.res .t { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.row .m { display: flex; gap: 8px; margin-top: 2px; color: var(--a-meta); white-space: nowrap; }
+.row .m .d { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.row .m .s { margin-left: auto; flex: none; color: var(--a-state); }
+.row .snip { margin-top: 4px; color: var(--a-meta); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+mark.hit { background: var(--a-hit); color: inherit; padding: 0 1px; }
+.row .job { margin-top: 7px; }
+.prog { height: 2px; background: var(--a-progress-track); width: 110px; position: relative; overflow: hidden; }
+.prog b { position: absolute; left: 0; top: 0; bottom: 0; background: var(--a-progress); }
+.prog.ind b { width: 18px; animation: ind 1.6s linear infinite; }
+@keyframes ind { from { left: -18px; } to { left: 110px; } }
+.row .job .tx { margin-top: 5px; color: var(--a-meta); }
+.lnk { border: 0; background: none; padding: 0; font: inherit; color: var(--a-text); text-decoration: underline; text-decoration-color: var(--a-progress-track); text-underline-offset: 2px; cursor: pointer; }
+.more { padding: 14px; color: var(--a-meta); }
+/* Nincs találat */
+.empty { padding: 18px 14px 10px; }
+.empty h3 { margin: 0 0 6px; font: var(--a-title); }
+.empty p { margin: 0 0 10px; color: var(--a-meta); }
+.empty .acts { display: flex; flex-wrap: wrap; gap: 6px 16px; }
+/* Olvasónézet (Matter átirat) */
+.reader { flex: 1; overflow: auto; padding: 14px 20px 0; }
+.reader .back { display: inline-flex; align-items: center; gap: 4px; color: var(--a-meta); margin-bottom: 16px; }
+.reader .src { font: var(--a-label); letter-spacing: .08em; text-transform: uppercase; color: var(--a-label-color); }
+.reader h1 { margin: 9px 0 6px; font: 800 22px/1.2 var(--a-font-ui); letter-spacing: -.01em; }
+.reader .rm { color: var(--a-meta); }
+.tabs { display: flex; gap: 18px; margin: 18px 0 18px; border-bottom: 1px solid var(--a-line); }
+.tabs span { padding: 0 0 7px; font: 400 13px/1 var(--a-font-ui); color: var(--a-meta); cursor: pointer; }
+.tabs span.on { font-weight: 600; color: var(--a-text); box-shadow: inset 0 -2px 0 var(--a-tab-line); }
+.reader .body p { margin: 0 0 14px; font: var(--a-read); color: var(--a-text); }
+.reader .run { display: flex; flex-direction: column; gap: 7px; margin: 4px 0 24px; color: var(--a-meta); }
+.ask { flex: none; border-top: 1px solid var(--a-line); padding: 12px 14px; display: flex; gap: 8px; align-items: center; }
+.ask input { flex: 1; min-width: 0; border: 0; outline: 0; font: 400 13px/1.3 var(--a-font-ui); color: var(--a-text); }
+.ask input::placeholder { color: var(--a-state); }
+.ask kbd { font: var(--a-meta-font); color: var(--a-state); }
+/* HUD a videón: ott jelenik meg, ahol görgetsz */
+.hud-vol { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 30px; height: 132px; border-radius: 6px; background: var(--a-hud); color: #fff; font: 600 11px/1 var(--a-font-ui); text-align: center; padding-top: 9px; }
+.hud-vol .tr { position: absolute; left: 14px; bottom: 14px; width: 2px; height: 88px; background: rgba(255,255,255,.35); }
+.hud-vol .tr b { position: absolute; left: 0; right: 0; bottom: 0; background: #fff; }
+.hud-vol .tr i { position: absolute; left: -6px; width: 14px; height: 14px; margin-bottom: -7px; border-radius: 50%; background: #fff; }
+.hud-time { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); border-radius: 6px; background: var(--a-hud); color: #fff; padding: 9px 11px 10px; font: 400 11px/1.3 var(--a-font-ui); }
+.hud-time .v { font: 600 15px/1.2 var(--a-font-ui); }
+.hud-time .k { color: rgba(255,255,255,.75); margin: 1px 0 7px; }
+.hud-time .tr { width: 96px; height: 2px; background: rgba(255,255,255,.35); position: relative; }
+.hud-time .tr b { position: absolute; left: 0; top: 0; bottom: 0; background: #fff; }
+.hud-mid { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); border-radius: 6px; background: var(--a-hud); color: #fff; padding: 8px 12px; font: 600 13px/1 var(--a-font-ui); }
+.hud-job { position: absolute; left: 14px; top: 14px; border-radius: 6px; background: var(--a-hud); color: #fff; padding: 8px 11px 9px; font: 400 12px/1.3 var(--a-font-ui); }
+.hud-job .tr { margin-top: 5px; width: 120px; height: 2px; background: rgba(255,255,255,.35); position: relative; }
+.hud-job .tr b { position: absolute; left: 0; top: 0; bottom: 0; background: #fff; }
+.hud-job .lnk { color: #fff; text-decoration-color: rgba(255,255,255,.5); margin-left: 8px; }
+</style>
+</head>
+<body>
+<script src="../ikonok.js"></script>
+<script src="../vonalas-ikonok.js"></script>
+<script src="../adat.js"></script>
+<script src="../keret.js"></script>
+<script>
+(function () {
+  const S = { view: 'lista', q: '', allWin: false, collapsed: {}, job: null };
+  let host, ctxState;
+  const esc = SV.esc;
+
+  function state(t) {
+    if (t.audible) return 'Hangot ad';
+    if (t.unread) return t.discarded ? 'Olvasatlan, altatva' : 'Olvasatlan';
+    if (t.discarded) return 'Altatva';
+    if (t.pinned) return 'Rögzítve';
+    return '';
+  }
+  function meta(t) {
+    const f = t.fields && t.fields.ar ? ` · ${SV.huf(t.fields.ar)}` : '';
+    return `${esc(SV.domain(t.url))}${f} · ${t.active ? 'aktív' : SV.ago(t.last)}`;
+  }
+  function row(t, extra) {
+    extra = extra || {};
+    const cls = ['row', t.active ? 'on' : '', t.discarded ? 'slept' : ''].join(' ');
+    const title = extra.q && extra.r && extra.r.inTitle ? SV.mark(t.title, extra.q, 'hit') : esc(t.title);
+    let m = meta(t), st = state(t);
+    if (extra.r) {
+      const where = extra.r.inTitle ? 'a címben' : extra.r.inText ? 'a szövegben' : 'az URL-ben';
+      m = `${where} · ${t.win !== 1 ? `${t.win}. ablak · ` : ''}${esc(SV.domain(t.url))}`;
+    }
+    const snip = extra.r && extra.r.inText && !extra.r.inTitle ? `<div class="snip">${SV.mark(SV.snippet(t.text, extra.q, 34), extra.q, 'hit')}</div>` : '';
+    const job = S.job && S.job.tab === t.id ? `<div class="job"><div class="prog"><b style="width:${S.job.pct}%"></b></div><div class="tx">Felirat készül · ${S.job.step} ${S.job.pct}% · <button class="lnk" data-stop>Megszakítás</button></div></div>` : '';
+    const cls2 = extra.r ? cls + ' res' : cls;
+    return `<div class="${cls2}" data-tab="${t.id}"><span class="ic">${SV.favicon(t, 16)}</span><div class="t">${title}</div><div class="m"><span class="d">${m}</span>${st ? `<span class="s">${st}</span>` : ''}</div>${snip}${job}</div>`;
+  }
+  function labelRow(key, text, color, n) {
+    return `<div class="label" data-g="${key}">${color ? `<i style="background:${color}"></i>` : ''}${esc(text)} <span class="n">· ${n}</span></div>`;
+  }
+  function listHTML() {
+    let html = '';
+    const wins = S.allWin ? [1, 2] : [1];
+    for (const w of wins) {
+      const tabs = SV.tabs.filter((t) => t.win === w);
+      if (S.allWin) html += `<div class="label" style="cursor:default">${w}. ablak <span class="n">· ${tabs.length} tab</span></div>`;
+      let cur;
+      for (let i = 0; i < tabs.length; i++) {
+        const t = tabs[i];
+        const key = t.pinned ? `p${w}` : t.group || `u${w}`;
+        if (key !== cur) {
+          cur = key;
+          const run = []; for (let j = i; j < tabs.length; j++) { const k = tabs[j].pinned ? `p${w}` : tabs[j].group || `u${w}`; if (k !== key) break; run.push(tabs[j]); }
+          if (t.pinned) html += labelRow(key, 'Rögzítve', null, run.length);
+          else if (t.group) html += labelRow(key, SV.groups[t.group].title, SV.groupColor[SV.groups[t.group].color], run.length);
+          else html += labelRow(key, i === 0 ? 'Csoport nélkül' : 'Többi', null, run.length);
+        }
+        if (!S.collapsed[key]) html += row(t);
+      }
+    }
+    const other = SV.tabs.filter((t) => t.win === 2).length;
+    html += `<div class="more">${S.allWin ? '<button class="lnk" data-win>Csak ez az ablak</button>' : `Másik ablak: 2. ablak, ${other} tab · <button class="lnk" data-win>Mutasd</button>`}</div>`;
+    return html;
+  }
+  function resultsHTML() {
+    const res = SV.search(S.q, SV.tabs);
+    if (!res.length) return { count: 'Nincs találat', body: emptyHTML() };
+    const nt = res.filter((r) => r.inTitle).length, nx = res.filter((r) => !r.inTitle && r.inText).length;
+    const parts = [nt && `${nt} a címben`, nx && `${nx} a szövegben`].filter(Boolean).join(', ');
+    return { count: `<b>${res.length} találat</b> · ${parts} · minden ablakban`, body: res.map((r) => row(r.tab, { r, q: S.q })).join('') };
+  }
+  function emptyHTML() {
+    const words = S.q.split(/\s+/).filter((w) => w.length > 2);
+    const near = []; for (const w of words) for (const r of SV.search(w, SV.tabs)) if (!near.some((x) => x.tab === r.tab)) near.push({ ...r, w });
+    const n = SV.tabs.length;
+    return `<div class="empty"><h3>Nincs ilyen nyitott tab: „${esc(S.q)}”</h3>
+      <p>${n} tab címében és URL-jében, és ${SV.extracted} tab szövegében kerestem, minden ablakban. Az altatott tabok szövegét az utolsó betöltéskor mentettem.</p>
+      <div class="acts"><button class="lnk" data-web>Keresés a weben: „${esc(S.q)}”</button><button class="lnk" data-clear>Keresés törlése</button></div></div>
+      ${near.length ? `<div class="label" style="cursor:default">Részben egyezik: „${esc(near[0].w)}” <span class="n">· ${near.length}</span></div>` + near.map((r) => row(r.tab, { r, q: r.w })).join('') : ''}`;
+  }
+  function readerHTML() {
+    const s = SV.summary;
+    return `<div class="reader">
+      <button class="lnk back" data-back style="text-decoration:none">${lineIcon('arrow-left', 14)}Tabok</button>
+      <div class="src">${esc(s.domain)} · teljes oldal</div>
+      <h1>${esc(s.source)}</h1>
+      <div class="rm">Claude · most · ${s.paragraphs.join(' ').split(/\s+/).length} szó eddig</div>
+      <div class="tabs"><span class="on">Összefoglaló</span><span>Kérdések</span></div>
+      <div class="body">${s.paragraphs.map((p) => `<p>${esc(p)}</p>`).join('')}</div>
+      <div class="run"><div class="prog ind"><b></b></div><div>Claude még írja… <button class="lnk" data-stop-sum>Leállítás</button></div></div>
+    </div>
+    <div class="ask"><input placeholder="Kérdezz az oldalról"><kbd>Enter</kbd></div>`;
+  }
+  function railHTML() {
+    const mods = SV.moduleOrder('a');
+    return `<nav class="rail" aria-label="Modulok"><div class="mods">${mods.map((m) => `<button data-id="${m.id}" class="${(S.view === 'osszefoglalo' && m.id === 'osszefoglalo') ? 'on' : ''} ${(S.job && m.id === 'felirat') ? 'busy' : ''}" style="${S.job && m.id === 'felirat' ? `--p:${S.job.pct}%` : ''}" title="${esc(m.name)}${m.key ? ' · ' + m.key : ''}\nHúzd a sorrendhez">${lineIcon(m.icon, 18)}</button>`).join('')}</div>
+      <span class="sp"></span><button title="Beállítások">${lineIcon('settings', 18)}</button></nav>`;
+  }
+  function draw() {
+    let main;
+    if (S.view === 'osszefoglalo') main = readerHTML();
+    else {
+      const r = S.q ? resultsHTML() : null;
+      main = `<div class="search">${lineIcon('search', 16, 'sicon')}<input value="${esc(S.q)}" placeholder="Keresés (cím, URL, szöveg)" aria-label="Keresés">${S.q ? `<button class="clear" data-clear title="Törlés (Esc)">${lineIcon('x', 16)}</button>` : ''}</div>
+        ${r ? `<div class="count">${r.count}</div>` : ''}
+        <div class="list">${r ? r.body : listHTML()}</div>`;
+    }
+    host.innerHTML = `<div class="a">${railHTML()}<div class="main">${main}</div></div>`;
+    host.querySelector('.sicon') && (host.querySelector('.sicon').style.color = 'var(--a-icon)');
+    SV.sortable(host.querySelector('.rail .mods'), 'a');
+    const inp = host.querySelector('.search input');
+    if (inp) {
+      inp.addEventListener('input', () => { S.q = inp.value; const pos = inp.selectionStart; draw(); const n = host.querySelector('.search input'); n.focus(); n.setSelectionRange(pos, pos); });
+      inp.addEventListener('keydown', (e) => { if (e.key === 'Escape') { S.q = ''; draw(); } if (e.key === 'Enter') { const f = host.querySelector('.row'); f && f.click(); } });
+    }
+  }
+  function onClick(e) {
+    const el = e.target.closest('[data-tab],[data-g],[data-win],[data-clear],[data-back],[data-id],[data-web],[data-stop],[data-stop-sum]');
+    if (!el) return;
+    if (el.dataset.tab) {
+      const t = SV.tabs.find((x) => x.id === +el.dataset.tab);
+      const r = Keret.openTab(t, S.q);
+      draw();
+      if (r.wasDiscarded) { const rr = host.querySelector(`[data-tab="${t.id}"] .s`) || host.querySelector(`[data-tab="${t.id}"] .m`); rr && rr.insertAdjacentHTML('beforeend', ' <span class="s">Felébresztve</span>'); }
+    } else if (el.dataset.g) { S.collapsed[el.dataset.g] = !S.collapsed[el.dataset.g]; draw(); }
+    else if ('win' in el.dataset) { S.allWin = !S.allWin; draw(); }
+    else if ('clear' in el.dataset) { S.q = ''; draw(); }
+    else if ('back' in el.dataset) { S.view = 'lista'; draw(); }
+    else if ('web' in el.dataset) { window.open('https://www.google.com/search?q=' + encodeURIComponent(S.q), '_blank'); }
+    else if ('stop' in el.dataset) { S.job = null; Keret.setBadge(null); draw(); const s = document.querySelector('[data-sv="sub"]'); s && s.remove(); const h = document.querySelector('[data-hud]'); h && (h.innerHTML = ''); }
+    else if ('stopSum' in el.dataset) { const run = host.querySelector('.run'); run.innerHTML = '<div>Leállítva. Az eddigi szöveg megmaradt.</div>'; }
+    else if (el.dataset.id === 'osszefoglalo') { S.view = 'osszefoglalo'; draw(); }
+    else if (el.dataset.id === 'felirat') { location.hash = 'felirat'; }
+    else if (el.dataset.id === 'altatas') { SV.tabs.filter((t) => t.win === 1 && !t.active && !t.audible && !t.pinned).forEach((t) => { t.discarded = true; }); draw(); }
+  }
+
+  const A = {
+    title: 'A · Olvasási sor',
+    render(st, el, ctx) {
+      host = el; ctxState = st;
+      S.view = st === 'osszefoglalo' ? 'osszefoglalo' : 'lista';
+      S.q = ctx.query || '';
+      S.job = st === 'felirat' ? { tab: 8, pct: SV.subtitle.pct, step: SV.subtitle.step } : null;
+      draw();
+      if (!host.dataset.bound) { host.addEventListener('click', onClick); host.dataset.bound = 1; }
+    },
+    badge() { return { text: S.job ? S.job.pct + '' : '', bg: '#000000', fg: '#ffffff' }; },
+    hud(c, mode, ev) {
+      const v = c.video;
+      let h = '';
+      if (ev && ev.side === 'bal') {
+        h += `<div class="hud-vol">${v.vol}<div class="tr"><b style="height:${v.vol}%"></b><i style="bottom:${v.vol}%"></i></div></div>`;
+      } else if (ev && (ev.side === 'jobb' || ev.side === 'sebesseg')) {
+        const big = ev.side === 'sebesseg' ? `${String(v.speed).replace('.', ',')}×` : c.fmt(v.t);
+        const k = ev.side === 'sebesseg' ? `sebesség · ${c.fmt(v.t)} / ${c.fmt(v.dur)}` : `${ev.step > 0 ? '+5' : '−5'} mp · ${c.fmt(v.dur)} · ${String(v.speed).replace('.', ',')}×`;
+        h += `<div class="hud-time"><div class="v">${big}</div><div class="k">${k}</div><div class="tr"><b style="width:${(v.t / v.dur) * 100}%"></b></div></div>`;
+      } else if (ev && ev.side === 'kozep') {
+        h += `<div class="hud-mid">${v.playing ? 'Lejátszás' : 'Szünet'}</div>`;
+      }
+      if (mode === 'felirat' && S.job) {
+        h += `<div class="hud-job">Felirat készül · ${S.job.step} ${S.job.pct}%<button class="lnk" data-stopv>Megszakítás</button><div class="tr"><b style="width:${S.job.pct}%"></b></div></div>`;
+      }
+      c.hud.innerHTML = h;
+      const b = c.hud.querySelector('[data-stopv]'); if (b) b.onclick = () => { S.job = null; Keret.setBadge(null); c.hud.innerHTML = ''; const s = c.el.querySelector('[data-sv="sub"]'); s && s.remove(); draw(); };
+    },
+  };
+  document.addEventListener('keydown', (e) => {
+    if (e.key === '/' && document.activeElement.tagName !== 'INPUT') { const i = host && host.querySelector('.search input'); if (i) { e.preventDefault(); i.focus(); } }
+  });
+  Keret.init(A);
+})();
+</script>
+</body>
+</html>
